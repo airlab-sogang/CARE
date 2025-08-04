@@ -238,3 +238,39 @@ body {
   border-radius: 15px;
   box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.05), inset -4px -4px 8px rgba(255, 255, 255, 0.6);
 }
+
+/* Section dividers and spacing */
+.section-divider {
+  margin: 60px 0 80px 0;
+  position: relative;
+}
+
+.section-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #ddd 20%, #ddd 80%, transparent);
+}
+
+.section-spacing {
+  margin-bottom: 50px;
+  padding-bottom: 40px;
+}
+
+.section-spacing:last-child {
+  margin-bottom: 0;
+}
+
+/* Enhanced section styling */
+.content-section {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 15px;
+  padding: 30px;
+  margin: 30px 0;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+}
