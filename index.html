@@ -103,12 +103,12 @@
             <div class="publication-links">
               <!-- PDF Link. -->
               <span class="link-block">
-                <a href="./CARE.pdf"
+                <a href="#"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="fas fa-file-pdf"></i>
                   </span>
-                  <span>Paper</span>
+                  <span>Paper (Coming Soon)</span>
                 </a>
               </span>
               <!-- Code Link. -->
@@ -341,9 +341,6 @@
               <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                 <source src="./static/videos/tb_exp.mp4" type="video/mp4">
               </video>
-              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>TurtleBot4 Exploration</strong>
-              </p>
             </div>
           </div>
 
@@ -361,9 +358,6 @@
               <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                 <source src="./static/videos/lb_exp.mp4" type="video/mp4">
               </video>
-              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>Locobot Exploration</strong>
-              </p>
             </div>
           </div>
 
@@ -381,9 +375,6 @@
               <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                 <source src="./static/videos/rm_exp.mp4" type="video/mp4">
               </video>
-              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>RoboMaster S1 Exploration</strong>
-              </p>
             </div>
           </div>
         </div>
@@ -436,9 +427,6 @@
               <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                 <source src="./static/videos/tb_navi.mp4" type="video/mp4">
               </video>
-              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>TurtleBot4 Navigation</strong>
-              </p>
             </div>
           </div>
 
@@ -456,9 +444,6 @@
               <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                 <source src="./static/videos/lb_navi.mp4" type="video/mp4">
               </video>
-              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>Locobot Navigation</strong>
-              </p>
             </div>
           </div>
 
@@ -476,9 +461,6 @@
               <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                 <source src="./static/videos/rm_navi.mp4" type="video/mp4">
               </video>
-              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>RoboMaster S1 Navigation</strong>
-              </p>
             </div>
           </div>
         </div>
@@ -486,6 +468,27 @@
       </div>
     </div>
     <!--/ Navigation. -->
+
+    <!-- Dynamic Obstacles. -->
+    <div class="columns is-centered has-text-centered section-spacing">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Dynamic Obstacles</h2>
+        <div class="content has-text-justified">
+          <p>
+            We conducted additional tests where up to three people abruptly crossed the robot path during navigation. 
+            Unlike static obstacles, these dynamic obstacles appeared suddenly from outside the camera field of view, 
+            testing CARE's ability to handle unpredictable scenarios where vision-only models often fail to generalize.
+          </p>
+        </div>
+
+        <div style="width: 100%; max-width: 800px; margin: 40px auto;">
+          <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <source src="./static/videos/dynamic.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+    <!--/ Dynamic Obstacles. -->
   </div>
 </section>
 
