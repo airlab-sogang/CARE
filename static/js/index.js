@@ -75,4 +75,116 @@ $(document).ready(function() {
 
     bulmaSlider.attach();
 
+    // Robot Carousel Functionality
+    function initRobotCarousels() {
+        const robots = ['turtlebot4', 'locobot', 'robomaster'];
+        
+        // Handle Exploration section
+        const explorationTabs = document.querySelectorAll('.exploration-tab');
+        const explorationSlides = document.querySelectorAll('.exploration-slide');
+        const explorationPrev = document.querySelector('.exploration-prev');
+        const explorationNext = document.querySelector('.exploration-next');
+        
+        let currentExplorationIndex = 0;
+        
+        function showExplorationSlide(index) {
+            // Hide all slides
+            explorationSlides.forEach(slide => {
+                slide.style.display = 'none';
+                slide.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            explorationTabs.forEach(tab => tab.classList.remove('is-active'));
+            
+            // Show current slide and activate tab
+            if (explorationSlides[index]) {
+                explorationSlides[index].style.display = 'block';
+                explorationSlides[index].classList.add('active');
+                explorationTabs[index].classList.add('is-active');
+            }
+        }
+        
+        // Exploration tab clicks
+        explorationTabs.forEach((tab, index) => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentExplorationIndex = index;
+                showExplorationSlide(index);
+            });
+        });
+        
+        // Exploration navigation arrows
+        if (explorationPrev) {
+            explorationPrev.addEventListener('click', () => {
+                currentExplorationIndex = (currentExplorationIndex - 1 + robots.length) % robots.length;
+                showExplorationSlide(currentExplorationIndex);
+            });
+        }
+        
+        if (explorationNext) {
+            explorationNext.addEventListener('click', () => {
+                currentExplorationIndex = (currentExplorationIndex + 1) % robots.length;
+                showExplorationSlide(currentExplorationIndex);
+            });
+        }
+        
+        // Handle Navigation section
+        const navigationTabs = document.querySelectorAll('.navigation-tab');
+        const navigationSlides = document.querySelectorAll('.navigation-slide');
+        const navigationPrev = document.querySelector('.navigation-prev');
+        const navigationNext = document.querySelector('.navigation-next');
+        
+        let currentNavigationIndex = 0;
+        
+        function showNavigationSlide(index) {
+            // Hide all slides
+            navigationSlides.forEach(slide => {
+                slide.style.display = 'none';
+                slide.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            navigationTabs.forEach(tab => tab.classList.remove('is-active'));
+            
+            // Show current slide and activate tab
+            if (navigationSlides[index]) {
+                navigationSlides[index].style.display = 'block';
+                navigationSlides[index].classList.add('active');
+                navigationTabs[index].classList.add('is-active');
+            }
+        }
+        
+        // Navigation tab clicks
+        navigationTabs.forEach((tab, index) => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentNavigationIndex = index;
+                showNavigationSlide(index);
+            });
+        });
+        
+        // Navigation navigation arrows
+        if (navigationPrev) {
+            navigationPrev.addEventListener('click', () => {
+                currentNavigationIndex = (currentNavigationIndex - 1 + robots.length) % robots.length;
+                showNavigationSlide(currentNavigationIndex);
+            });
+        }
+        
+        if (navigationNext) {
+            navigationNext.addEventListener('click', () => {
+                currentNavigationIndex = (currentNavigationIndex + 1) % robots.length;
+                showNavigationSlide(currentNavigationIndex);
+            });
+        }
+        
+        // Initialize with first slide visible
+        showExplorationSlide(0);
+        showNavigationSlide(0);
+    }
+    
+    // Initialize robot carousels
+    initRobotCarousels();
+
 })

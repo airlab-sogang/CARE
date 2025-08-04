@@ -69,12 +69,34 @@
           <h1 class="title is-1 publication-title">CARE: Enhancing Safety of Visual Navigation through Collision Avoidance via Repulsive Estimation</h1>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
-              Anonymous Submission
+              <a href="#">Joonkyung Kim</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="#">Joonyeol Sim</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="#">Woojun Kim</a><sup>2</sup>,</span>
+            <span class="author-block">
+              <a href="#">Katia P. Sycara</a><sup>2</sup>,</span>
+            <span class="author-block">
+              <a href="#">Changjoo Nam</a><sup>1</sup>
             </span>
           </div>
 
           <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Sogang University,</span>
+            <span class="author-block"><sup>2</sup>Carnegie Mellon University</span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
             <span class="author-block">9th Conference on Robot Learning (CoRL 2025), Seoul, Korea.</span>
+          </div>
+
+          <div class="is-size-6 publication-authors" style="margin-top: 10px;">
+            <span class="author-block">
+              <strong>Oral Talk</strong> at 
+              <a href="https://lfmrss2025.weebly.com/" target="_blank" style="color: #3273dc;">
+                RSS Workshop on Large Foundation Model For Interactive Robot Learning 2025
+              </a>
+            </span>
           </div>
 
           <div class="column has-text-centered">
@@ -111,16 +133,25 @@
 <section class="hero teaser">
   <div class="container is-max-desktop">
     <div class="hero-body">
-      <div style="width: 100%; max-width: 800px; height: 400px; background-color: #f5f5f5; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-        <div style="text-align: center; color: #666;">
-          <i class="fas fa-image" style="font-size: 48px; margin-bottom: 10px;"></i>
-          <p><strong>CARE Framework Teaser Image</strong></p>
-          <p>Placeholder for main teaser image showing CARE in action</p>
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Video</h2>
+          <div class="publication-video">
+            <iframe src="https://www.youtube.com/embed/OrncVUgph6o?si=NOd1UQ0ILnCtWBTv" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin" 
+                    allowfullscreen></iframe>
+          </div>
+          <div class="content has-text-justified" style="margin-top: 20px;">
+            <p>
+              This video demonstrates <span class="dnerf">CARE</span> in action across different robot platforms, 
+              showing how our collision avoidance system enhances navigation safety in real-world scenarios.
+            </p>
+          </div>
         </div>
       </div>
-      <h2 class="subtitle has-text-centered">
-        <span class="dnerf">CARE</span> enhances the safety of vision-based navigation without requiring additional sensors or fine-tuning.
-      </h2>
     </div>
   </div>
 </section>
@@ -138,14 +169,8 @@
           <p>
             We propose <span class="dnerf">CARE</span> (Collision Avoidance via Repulsive Estimation)
             to improve the robustness of learning-based visual navigation methods. Recently, visual navigation models, particularly foundation models, have demonstrated promising performance by generating viable trajectories using only RGB images.
-          </p>
-          <p>
-            However, these policies can generalize poorly to environments containing out-of-distribution (OOD) scenes characterized by unseen objects or different camera setups. Without fine-tuning, such models could produce trajectories that lead to collisions, necessitating substantial efforts in data collection and additional training.
-          </p>
-          <p>
+            However, these policies can generalize poorly to environments containing out-of-distribution (OOD) scenes characterized by unseen objects or different camera setups (e.g., variations in field of view, camera pose, or focal length). Without fine-tuning, such models could produce trajectories that lead to collisions, necessitating substantial efforts in data collection and additional training.
             To address this limitation, we introduce <span class="dnerf">CARE</span>, an attachable module that enhances the safety of visual navigation without requiring additional range sensors or fine-tuning of pretrained models. CARE can be integrated seamlessly into any RGB-based navigation model that generates local robot trajectories. It dynamically adjusts trajectories produced by a pretrained model using repulsive force vectors computed from depth images estimated directly from RGB inputs.
-          </p>
-          <p>
             We evaluate <span class="dnerf">CARE</span> by integrating it with state-of-the-art visual navigation models across diverse robot platforms. Real-world experiments show that CARE significantly reduces collisions (up to 100%) without compromising navigation performance in goal-conditioned navigation, and further improves collision-free travel distance (up to 10.7×) in exploration tasks.
           </p>
         </div>
@@ -153,27 +178,6 @@
     </div>
     <!--/ Abstract. -->
 
-    <!-- Paper video. -->
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Video</h2>
-        <div class="publication-video">
-          <iframe src="https://www.youtube.com/embed/OrncVUgph6o?si=NOd1UQ0ILnCtWBTv" 
-                  title="YouTube video player" 
-                  frameborder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                  referrerpolicy="strict-origin-when-cross-origin" 
-                  allowfullscreen></iframe>
-        </div>
-        <div class="content has-text-justified" style="margin-top: 20px;">
-          <p>
-            This video demonstrates <span class="dnerf">CARE</span> in action across different robot platforms, 
-            showing how our collision avoidance system enhances navigation safety in real-world scenarios.
-          </p>
-        </div>
-      </div>
-    </div>
-    <!--/ Paper video. -->
 
     <!-- Method Overview. -->
     <div class="columns is-centered has-text-centered">
@@ -190,15 +194,114 @@
           <img src="./static/figures/method_overview.png" 
                alt="CARE Method Overview - Three-stage framework showing top-down range estimation, repulsive force estimation, and safety-enhancing mechanism" 
                style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-          <p style="margin-top: 15px; color: #666; font-size: 0.9rem;">
-            <strong>Figure 2:</strong> Overview of CARE framework showing the three-stage process: 
-            (1) Top-down range estimation, (2) Repulsive force estimation and trajectory adjustment, 
-            (3) Safety-enhancing mechanism.
-          </p>
         </div>
       </div>
     </div>
     <!--/ Method Overview. -->
+
+    <!-- Robot Platforms. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Robot Platforms</h2>
+        <div class="content has-text-justified">
+          <p>
+            We evaluate CARE across three diverse robot platforms with different hardware configurations 
+            and camera setups to demonstrate the generalizability of our approach.
+          </p>
+        </div>
+        
+        <div class="columns is-centered" style="margin-top: 40px;">
+          <!-- TurtleBot4 -->
+          <div class="column is-one-third">
+            <div class="robot-platform-card" style="text-align: center; padding: 20px;">
+              <img src="./static/figures/Turtlebot4.png" 
+                   alt="TurtleBot4 robot platform" 
+                   style="width: 100%; max-width: 250px; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 15px;">
+              <h4 class="title is-5">TurtleBot4</h4>
+              <div class="content" style="font-size: 0.9rem; color: #666;">
+                <p>Differential drive robot with front-mounted RGB-D camera for indoor navigation and exploration tasks.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- LoCoBot -->
+          <div class="column is-one-third">
+            <div class="robot-platform-card" style="text-align: center; padding: 20px;">
+              <img src="./static/figures/LoCoBot.png" 
+                   alt="LoCoBot robot platform" 
+                   style="width: 100%; max-width: 250px; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 15px;">
+              <h4 class="title is-5">LoCoBot</h4>
+              <div class="content" style="font-size: 0.9rem; color: #666;">
+                <p>Mobile manipulation platform with RGB camera for versatile navigation and interaction capabilities.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- RoboMaster S1 -->
+          <div class="column is-one-third">
+            <div class="robot-platform-card" style="text-align: center; padding: 20px;">
+              <img src="./static/figures/RoboMaster.png" 
+                   alt="RoboMaster S1 robot platform" 
+                   style="width: 100%; max-width: 250px; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 15px;">
+              <h4 class="title is-5">RoboMaster S1</h4>
+              <div class="content" style="font-size: 0.9rem; color: #666;">
+                <p>Omnidirectional mobile robot with front camera for agile movement and collision avoidance testing.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ Robot Platforms. -->
+
+    <!-- Experimental Results. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Experimental Results</h2>
+        <div class="content has-text-justified">
+          <p>
+            We conduct comprehensive experiments across two main tasks: exploration and goal-conditioned navigation. 
+            Our evaluation demonstrates CARE's effectiveness in enhancing navigation safety while maintaining performance 
+            across diverse robot platforms and environments.
+          </p>
+        </div>
+        
+        <div class="columns is-centered" style="margin-top: 40px;">
+          <!-- Exploration Results -->
+          <div class="column is-half">
+            <div style="text-align: center; padding: 20px;">
+              <img src="./static/figures/exploration.png" 
+                   alt="Exploration Results - CARE performance comparison across different robot platforms in exploration tasks" 
+                   style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 15px;">
+              <h4 class="title is-5">Exploration Performance</h4>
+              <div class="content" style="font-size: 0.9rem; color: #666; text-align: left;">
+                <p>
+                  CARE significantly improves collision-free travel distances up to 10.7× compared to baseline methods. 
+                  The results show consistent performance gains across all three robot platforms in unknown environments.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Navigation Results -->
+          <div class="column is-half">
+            <div style="text-align: center; padding: 20px;">
+              <img src="./static/figures/navigation.png" 
+                   alt="Navigation Results - CARE performance comparison in goal-conditioned navigation tasks" 
+                   style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 15px;">
+              <h4 class="title is-5">Navigation Performance</h4>
+              <div class="content" style="font-size: 0.9rem; color: #666; text-align: left;">
+                <p>
+                  In goal-conditioned navigation tasks, CARE achieves up to 100% collision reduction while maintaining 
+                  high task success rates. The system adapts seamlessly to different robot configurations and camera setups.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ Experimental Results. -->
 
     <!-- Exploration. -->
     <div class="columns is-centered has-text-centered">
@@ -212,59 +315,92 @@
           </p>
         </div>
 
-        <!-- Turtlebot4 Exploration -->
-        <h3 class="title is-4">Turtlebot4</h3>
-        <div class="content has-text-justified">
-          <p>
-            TurtleBot4 demonstrates improved exploration performance with CARE integration, 
-            achieving collision-free travel distances up to 10.7× longer than baseline methods 
-            in complex indoor environments.
-          </p>
-        </div>
-        <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
-          <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <source src="./static/videos/tb_exp.mp4" type="video/mp4">
-          </video>
-          <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-            <strong>TurtleBot4 Exploration</strong> - Collision-free exploration results
-          </p>
+        <!-- Robot Selection Tabs -->
+        <div class="tabs is-centered is-large" style="margin-bottom: 30px;">
+          <ul>
+            <li class="exploration-tab is-active" data-robot="turtlebot4">
+              <a>TurtleBot4</a>
+            </li>
+            <li class="exploration-tab" data-robot="locobot">
+              <a>Locobot</a>
+            </li>
+            <li class="exploration-tab" data-robot="robomaster">
+              <a>RoboMaster S1</a>
+            </li>
+          </ul>
         </div>
 
-        <!-- Locobot Exploration -->
-        <h3 class="title is-4">Locobot</h3>
-        <div class="content has-text-justified">
-          <p>
-            Locobot shows significant improvement in exploration tasks with CARE, 
-            maintaining safe navigation while covering larger areas in unknown environments 
-            with diverse obstacle configurations.
-          </p>
-        </div>
-        <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
-          <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <source src="./static/videos/lb_exp.mp4" type="video/mp4">
-          </video>
-          <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-            <strong>Locobot Exploration</strong> - Safe area coverage and mapping
-          </p>
+        <!-- Robot Carousel Container -->
+        <div class="robot-carousel-container" style="position: relative;">
+          <!-- Navigation Arrows -->
+          <button class="carousel-nav carousel-prev exploration-prev" style="position: absolute; left: -50px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer;">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="carousel-nav carousel-next exploration-next" style="position: absolute; right: -50px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer;">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+
+          <!-- TurtleBot4 Slide -->
+          <div class="robot-slide exploration-slide active" data-robot="turtlebot4">
+            <h3 class="title is-4">TurtleBot4</h3>
+            <div class="content has-text-justified">
+              <p>
+                TurtleBot4 demonstrates improved exploration performance with CARE integration, 
+                achieving collision-free travel distances up to 10.7× longer than baseline methods 
+                in complex indoor environments.
+              </p>
+            </div>
+            <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
+              <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <source src="./static/videos/tb_exp.mp4" type="video/mp4">
+              </video>
+              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
+                <strong>TurtleBot4 Exploration</strong> - Collision-free exploration results
+              </p>
+            </div>
+          </div>
+
+          <!-- Locobot Slide -->
+          <div class="robot-slide exploration-slide" data-robot="locobot" style="display: none;">
+            <h3 class="title is-4">Locobot</h3>
+            <div class="content has-text-justified">
+              <p>
+                Locobot shows significant improvement in exploration tasks with CARE, 
+                maintaining safe navigation while covering larger areas in unknown environments 
+                with diverse obstacle configurations.
+              </p>
+            </div>
+            <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
+              <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <source src="./static/videos/lb_exp.mp4" type="video/mp4">
+              </video>
+              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
+                <strong>Locobot Exploration</strong> - Safe area coverage and mapping
+              </p>
+            </div>
+          </div>
+
+          <!-- RoboMaster S1 Slide -->
+          <div class="robot-slide exploration-slide" data-robot="robomaster" style="display: none;">
+            <h3 class="title is-4">RoboMaster S1</h3>
+            <div class="content has-text-justified">
+              <p>
+                RoboMaster S1 benefits from CARE's collision avoidance capabilities during exploration, 
+                enabling safe navigation with its front-mounted camera configuration while 
+                discovering new environments efficiently.
+              </p>
+            </div>
+            <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
+              <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <source src="./static/videos/rm_exp.mp4" type="video/mp4">
+              </video>
+              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
+                <strong>RoboMaster S1 Exploration</strong> - Front-camera exploration performance
+              </p>
+            </div>
+          </div>
         </div>
 
-        <!-- RoboMaster S1 Exploration -->
-        <h3 class="title is-4">RoboMaster S1</h3>
-        <div class="content has-text-justified">
-          <p>
-            RoboMaster S1 benefits from CARE's collision avoidance capabilities during exploration, 
-            enabling safe navigation with its front-mounted camera configuration while 
-            discovering new environments efficiently.
-          </p>
-        </div>
-        <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
-          <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <source src="./static/videos/rm_exp.mp4" type="video/mp4">
-          </video>
-          <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-            <strong>RoboMaster S1 Exploration</strong> - Front-camera exploration performance
-          </p>
-        </div>
       </div>
     </div>
     <!--/ Exploration. -->
@@ -281,59 +417,92 @@
           </p>
         </div>
 
-        <!-- Turtlebot4 Navigation -->
-        <h3 class="title is-4">Turtlebot4</h3>
-        <div class="content has-text-justified">
-          <p>
-            TurtleBot4 achieves up to 100% collision reduction in goal-conditioned navigation tasks 
-            with CARE integration, successfully reaching target destinations while avoiding obstacles 
-            in dynamic environments.
-          </p>
-        </div>
-        <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
-          <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <source src="./static/videos/tb_navi.mp4" type="video/mp4">
-          </video>
-          <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-            <strong>TurtleBot4 Navigation</strong> - Goal-reaching with collision avoidance
-          </p>
+        <!-- Robot Selection Tabs -->
+        <div class="tabs is-centered is-large" style="margin-bottom: 30px;">
+          <ul>
+            <li class="navigation-tab is-active" data-robot="turtlebot4">
+              <a>TurtleBot4</a>
+            </li>
+            <li class="navigation-tab" data-robot="locobot">
+              <a>Locobot</a>
+            </li>
+            <li class="navigation-tab" data-robot="robomaster">
+              <a>RoboMaster S1</a>
+            </li>
+          </ul>
         </div>
 
-        <!-- Locobot Navigation -->
-        <h3 class="title is-4">Locobot</h3>
-        <div class="content has-text-justified">
-          <p>
-            Locobot demonstrates robust navigation performance with CARE, 
-            successfully navigating to specified goals while maintaining safety 
-            in complex indoor environments with various obstacle types.
-          </p>
-        </div>
-        <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
-          <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <source src="./static/videos/lb_navi.mp4" type="video/mp4">
-          </video>
-          <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-            <strong>Locobot Navigation</strong> - Precise goal navigation results
-          </p>
+        <!-- Robot Carousel Container -->
+        <div class="robot-carousel-container" style="position: relative;">
+          <!-- Navigation Arrows -->
+          <button class="carousel-nav carousel-prev navigation-prev" style="position: absolute; left: -50px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer;">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="carousel-nav carousel-next navigation-next" style="position: absolute; right: -50px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer;">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+
+          <!-- TurtleBot4 Slide -->
+          <div class="robot-slide navigation-slide active" data-robot="turtlebot4">
+            <h3 class="title is-4">TurtleBot4</h3>
+            <div class="content has-text-justified">
+              <p>
+                TurtleBot4 achieves up to 100% collision reduction in goal-conditioned navigation tasks 
+                with CARE integration, successfully reaching target destinations while avoiding obstacles 
+                in dynamic environments.
+              </p>
+            </div>
+            <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
+              <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <source src="./static/videos/tb_navi.mp4" type="video/mp4">
+              </video>
+              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
+                <strong>TurtleBot4 Navigation</strong> - Goal-reaching with collision avoidance
+              </p>
+            </div>
+          </div>
+
+          <!-- Locobot Slide -->
+          <div class="robot-slide navigation-slide" data-robot="locobot" style="display: none;">
+            <h3 class="title is-4">Locobot</h3>
+            <div class="content has-text-justified">
+              <p>
+                Locobot demonstrates robust navigation performance with CARE, 
+                successfully navigating to specified goals while maintaining safety 
+                in complex indoor environments with various obstacle types.
+              </p>
+            </div>
+            <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
+              <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <source src="./static/videos/lb_navi.mp4" type="video/mp4">
+              </video>
+              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
+                <strong>Locobot Navigation</strong> - Precise goal navigation results
+              </p>
+            </div>
+          </div>
+
+          <!-- RoboMaster S1 Slide -->
+          <div class="robot-slide navigation-slide" data-robot="robomaster" style="display: none;">
+            <h3 class="title is-4">RoboMaster S1</h3>
+            <div class="content has-text-justified">
+              <p>
+                RoboMaster S1 shows improved navigation safety with CARE, 
+                leveraging its mobility capabilities while ensuring collision-free 
+                path execution to designated targets.
+              </p>
+            </div>
+            <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
+              <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <source src="./static/videos/rm_navi.mp4" type="video/mp4">
+              </video>
+              <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
+                <strong>RoboMaster S1 Navigation</strong> - Safe goal-directed movement
+              </p>
+            </div>
+          </div>
         </div>
 
-        <!-- RoboMaster S1 Navigation -->
-        <h3 class="title is-4">RoboMaster S1</h3>
-        <div class="content has-text-justified">
-          <p>
-            RoboMaster S1 shows improved navigation safety with CARE, 
-            leveraging its mobility capabilities while ensuring collision-free 
-            path execution to designated targets.
-          </p>
-        </div>
-        <div style="width: 100%; max-width: 600px; margin: 0 auto 30px;">
-          <video poster="" autoplay controls muted loop playsinline style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <source src="./static/videos/rm_navi.mp4" type="video/mp4">
-          </video>
-          <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-            <strong>RoboMaster S1 Navigation</strong> - Safe goal-directed movement
-          </p>
-        </div>
       </div>
     </div>
     <!--/ Navigation. -->
