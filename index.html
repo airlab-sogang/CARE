@@ -87,7 +87,7 @@
           </div>
 
           <div class="is-size-5 publication-authors">
-            <span class="author-block">9th Conference on Robot Learning (CoRL 2025), Seoul, Korea.</span>
+            <span class="author-block">9th Annual Conference on Robot Learning (CoRL 2025), Seoul, Korea.</span>
           </div>
 
           <div class="is-size-6 publication-authors" style="margin-top: 10px;">
@@ -103,7 +103,7 @@
             <div class="publication-links">
               <!-- PDF Link. -->
               <span class="link-block">
-                <a href="./568_CARE.pdf"
+                <a href="./CARE.pdf"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="fas fa-file-pdf"></i>
@@ -134,8 +134,8 @@
   <div class="container is-max-desktop">
     <div class="hero-body">
       <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
-          <h2 class="title is-3">Video</h2>
+        <div class="column is-full">
+          <h2 class="title is-3">Summary Video</h2>
           <div class="publication-video">
             <iframe src="https://www.youtube.com/embed/OrncVUgph6o?si=NOd1UQ0ILnCtWBTv" 
                     title="YouTube video player" 
@@ -143,12 +143,6 @@
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                     referrerpolicy="strict-origin-when-cross-origin" 
                     allowfullscreen></iframe>
-          </div>
-          <div class="content has-text-justified" style="margin-top: 20px;">
-            <p>
-              This video demonstrates <span class="dnerf">CARE</span> in action across different robot platforms, 
-              showing how our collision avoidance system enhances navigation safety in real-world scenarios.
-            </p>
           </div>
         </div>
       </div>
@@ -178,8 +172,6 @@
     </div>
     <!--/ Abstract. -->
 
-    <div class="section-divider"></div>
-
 
     <!-- Method Overview. -->
     <div class="columns is-centered has-text-centered section-spacing">
@@ -201,8 +193,6 @@
     </div>
     <!--/ Method Overview. -->
 
-    <div class="section-divider"></div>
-
     <!-- Robot Platforms. -->
     <div class="columns is-centered has-text-centered section-spacing">
       <div class="column is-four-fifths">
@@ -223,7 +213,7 @@
                    style="width: 100%; max-width: 250px; height: auto; margin-bottom: 15px;">
               <h4 class="title is-5">TurtleBot4</h4>
               <div class="content" style="font-size: 0.9rem; color: #666;">
-                <p>Differential drive robot with front-mounted RGB-D camera for indoor navigation and exploration tasks.</p>
+                <p>89.5° FOV OAK-D Pro camera</p>
               </div>
             </div>
           </div>
@@ -236,7 +226,7 @@
                    style="width: 100%; max-width: 250px; height: auto; margin-bottom: 15px;">
               <h4 class="title is-5">LoCoBot</h4>
               <div class="content" style="font-size: 0.9rem; color: #666;">
-                <p>Mobile manipulation platform with RGB camera for versatile navigation and interaction capabilities.</p>
+                <p>170° FOV fisheye camera</p>
               </div>
             </div>
           </div>
@@ -249,7 +239,7 @@
                    style="width: 100%; max-width: 250px; height: auto; margin-bottom: 15px;">
               <h4 class="title is-5">RoboMaster S1</h4>
               <div class="content" style="font-size: 0.9rem; color: #666;">
-                <p>Omnidirectional mobile robot with front camera for agile movement and collision avoidance testing.</p>
+                <p>120° FOV camera</p>
               </div>
             </div>
           </div>
@@ -258,17 +248,15 @@
     </div>
     <!--/ Robot Platforms. -->
 
-    <div class="section-divider"></div>
-
     <!-- Experimental Results. -->
     <div class="columns is-centered has-text-centered section-spacing">
       <div class="column is-four-fifths">
         <h2 class="title is-3">Experimental Results</h2>
         <div class="content has-text-justified">
           <p>
-            We conduct comprehensive experiments across two main tasks: exploration and goal-conditioned navigation. 
-            Our evaluation demonstrates CARE's effectiveness in enhancing navigation safety while maintaining performance 
-            across diverse robot platforms and environments.
+            We conduct comprehensive experiments across two main tasks: undirected exploration and image goal-conditioned navigation. 
+            The undirected exploration task evaluates the robot's ability to explore safely in environments with unseen objects, 
+            while the image goal-conditioned navigation task tests navigation capability in corridors with random unseen obstacles.
           </p>
         </div>
         
@@ -282,7 +270,7 @@
               <h4 class="title is-5">Exploration Performance</h4>
               <div class="content" style="font-size: 0.9rem; color: #666; text-align: left;">
                 <p>
-                  CARE significantly improves collision-free travel distances up to 10.7× compared to baseline methods. 
+                  CARE significantly improves collision-free travel distances up to 10.7× compared to baseline methods.
                   The results show consistent performance gains across all three robot platforms in unknown environments.
                 </p>
               </div>
@@ -298,7 +286,7 @@
               <h4 class="title is-5">Navigation Performance</h4>
               <div class="content" style="font-size: 0.9rem; color: #666; text-align: left;">
                 <p>
-                  In goal-conditioned navigation tasks, CARE achieves up to 100% collision reduction while maintaining 
+                  In goal-conditioned navigation tasks, CARE achieves up to 100% collision reduction while maintaining
                   high task success rates. The system adapts seamlessly to different robot configurations and camera setups.
                 </p>
               </div>
@@ -309,19 +297,10 @@
     </div>
     <!--/ Experimental Results. -->
 
-    <div class="section-divider"></div>
-
     <!-- Exploration. -->
     <div class="columns is-centered has-text-centered section-spacing">
       <div class="column is-four-fifths">
-        <h2 class="title is-3">Exploration</h2>
-        <div class="content has-text-justified">
-          <p>
-            CARE enhances exploration capabilities by enabling robots to travel longer distances 
-            without collisions in unknown environments. The system maintains safe navigation 
-            while allowing the robot to discover new areas effectively.
-          </p>
-        </div>
+        <h2 class="title is-3">Undirected Exploration</h2>
 
         <!-- Robot Selection Tabs -->
         <div class="tabs is-centered is-large" style="margin-bottom: 30px;">
@@ -363,7 +342,7 @@
                 <source src="./static/videos/tb_exp.mp4" type="video/mp4">
               </video>
               <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>TurtleBot4 Exploration</strong> - Collision-free exploration results
+                <strong>TurtleBot4 Exploration</strong>
               </p>
             </div>
           </div>
@@ -383,7 +362,7 @@
                 <source src="./static/videos/lb_exp.mp4" type="video/mp4">
               </video>
               <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>Locobot Exploration</strong> - Safe area coverage and mapping
+                <strong>Locobot Exploration</strong>
               </p>
             </div>
           </div>
@@ -403,7 +382,7 @@
                 <source src="./static/videos/rm_exp.mp4" type="video/mp4">
               </video>
               <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>RoboMaster S1 Exploration</strong> - Front-camera exploration performance
+                <strong>RoboMaster S1 Exploration</strong>
               </p>
             </div>
           </div>
@@ -413,19 +392,10 @@
     </div>
     <!--/ Exploration. -->
 
-    <div class="section-divider"></div>
-
     <!-- Navigation. -->
     <div class="columns is-centered has-text-centered section-spacing">
       <div class="column is-four-fifths">
-        <h2 class="title is-3">Navigation</h2>
-        <div class="content has-text-justified">
-          <p>
-            CARE significantly improves goal-conditioned navigation by reducing collision rates 
-            while maintaining navigation efficiency. The system adapts to different robot platforms 
-            and camera configurations seamlessly.
-          </p>
-        </div>
+        <h2 class="title is-3">Image Goal-Conditioned Navigation</h2>
 
         <!-- Robot Selection Tabs -->
         <div class="tabs is-centered is-large" style="margin-bottom: 30px;">
@@ -467,7 +437,7 @@
                 <source src="./static/videos/tb_navi.mp4" type="video/mp4">
               </video>
               <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>TurtleBot4 Navigation</strong> - Goal-reaching with collision avoidance
+                <strong>TurtleBot4 Navigation</strong>
               </p>
             </div>
           </div>
@@ -487,7 +457,7 @@
                 <source src="./static/videos/lb_navi.mp4" type="video/mp4">
               </video>
               <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>Locobot Navigation</strong> - Precise goal navigation results
+                <strong>Locobot Navigation</strong>
               </p>
             </div>
           </div>
@@ -507,7 +477,7 @@
                 <source src="./static/videos/rm_navi.mp4" type="video/mp4">
               </video>
               <p style="margin-top: 10px; text-align: center; color: #666; font-size: 0.9rem;">
-                <strong>RoboMaster S1 Navigation</strong> - Safe goal-directed movement
+                <strong>RoboMaster S1 Navigation</strong>
               </p>
             </div>
           </div>
@@ -528,7 +498,7 @@
     <pre><code>@inproceedings{care2025,
   title={CARE: Enhancing Safety of Visual Navigation through Collision Avoidance via Repulsive Estimation},
   author={Joonkyung Kim and Joonyeol Sim and Woojun Kim and Katia P. Sycara and Changjoo Nam},
-  booktitle={9th Conference on Robot Learning (CoRL)},
+  booktitle={9th Annual Conference on Robot Learning (CoRL)},
   year={2025},
   address={Seoul, Korea}
 }</code></pre>
@@ -540,7 +510,7 @@
   <div class="container">
     <div class="content has-text-centered">
       <a class="icon-link"
-         href="./568_CARE.pdf">
+         href="./CARE.pdf">
         <i class="fas fa-file-pdf"></i>
       </a>
     </div>
