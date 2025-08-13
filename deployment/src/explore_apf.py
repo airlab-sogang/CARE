@@ -73,13 +73,11 @@ class ExplorationNode(Node):
             prediction_type="epsilon",
         )
 
-        # State & ROS‑interfaces --------------------------------------------
         self.context_queue: Deque[np.ndarray] = deque(maxlen=self.context_size + 1)
         self.bridge = CvBridge()
 
-        # 로봇 타입에 따른 이미지 토픽 선택
         if args.robot == "locobot":
-            image_topic = "/robot1/camera/image"  # 상수에서 가져옴
+            image_topic = "/robot1/camera/image"
             waypoint_topic = "/robot1/waypoint"
             sampled_actions_topic = "/robot1/sampled_actions"
             trajectory_viz_topic = "/robot1/trajectory_viz"
@@ -132,7 +130,6 @@ class ExplorationNode(Node):
         self.top_view_resolution = self.top_view_size[0] / self.proximity_threshold
         self.top_view_sampling_step = 5
 
-        # 로봇 타입에 따른 이미지 크기 설정
         if args.robot == "locobot" or args.robot == "locobot2":
             self.DIM = (320, 240)
         elif args.robot == "robomaster":
@@ -140,7 +137,6 @@ class ExplorationNode(Node):
         elif args.robot == "turtlebot4":
             self.DIM = (320, 200)
 
-        # Config에서 intrinsics path 가져오기
         intrinsics_path = self._get_intrinsics_path_from_config()
         self._init_depth_model(intrinsics_path)
 
@@ -198,12 +194,9 @@ class ExplorationNode(Node):
         self.get_logger().info("=" * 60)
 
     def _get_intrinsics_path_from_config(self) -> str:
-        """Config 파일에서 intrinsics path를 가져오는 함수"""
-        # robot.yaml에서 intrinsics path 가져오기
         if "intrinsics_path" in ROBOT_CONF:
             intrinsics_path = ROBOT_CONF["intrinsics_path"]
         else:
-            # 로봇 타입별로 기본 intrinsics path 설정
             if self.args.robot == "locobot":
                 intrinsics_path = ROBOT_CONF.get("locobot_intrinsics_path",
                                                  "intrinsic/locobot/intrinsics.npy")
@@ -216,14 +209,12 @@ class ExplorationNode(Node):
             else:
                 raise ValueError(f"No intrinsics path configured for robot type: {self.args.robot}")
 
-        # 상대 경로를 절대 경로로 변환
         if not os.path.isabs(intrinsics_path):
             intrinsics_path = str(THIS_DIR / intrinsics_path)
 
         return intrinsics_path
 
     def _init_depth_model(self, intrinsics_path: str):
-        """Depth model과 camera intrinsics 초기화"""
         if not intrinsics_path:
             raise ValueError("Intrinsics path is not provided.")
         if not os.path.exists(intrinsics_path):
@@ -232,25 +223,19 @@ class ExplorationNode(Node):
         self.K = np.load(intrinsics_path)
         self.get_logger().info(f"Loaded camera intrinsics from: {intrinsics_path}")
 
-        # UniDepth 모델 초기화
         self.depth_model = UniDepthV2.from_pretrained("lpiccinelli/unidepth-v2-vits14").to(self.device)
         self.depth_model.eval()
-
-    # ------------------------------------------------------------------
-    # Callbacks
-    # ------------------------------------------------------------------
 
     def _image_cb(self, msg: Image):
         now = self.get_clock().now()
         if (now - self.last_ctx_time).nanoseconds < self.ctx_dt * 1e9:
-            return  # 아직 0.25 s 안 지났으면 무시
+            return
         self.context_queue.append(msg_to_pil(msg))
         self.last_ctx_time = now
         self.get_logger().info(
             f"Image added to context queue ({len(self.context_queue)})"
         )
 
-        # depth 추론 및 장애물 저장
         cv2_img = self.bridge.imgmsg_to_cv2(msg)
 
         if self.args.robot == "locobot" or self.args.robot == "locobot2":
@@ -359,9 +344,8 @@ class ExplorationNode(Node):
 
     def _timer_cb(self):
         if len(self.context_queue) <= self.context_size:
-            return  # not enough context yet
+            return
 
-        # 1. Prepare tensors ------------------------------------------------
         obs_imgs = transform_images(
             list(self.context_queue), self.model_params["image_size"], center_crop=False
         ).to(self.device)
@@ -395,24 +379,16 @@ class ExplorationNode(Node):
                 )
                 naction = self.noise_scheduler.step(noise_pred, k, naction).prev_sample
 
-        # 2. Publish Float32MultiArray msgs ----------------------------------
         traj_batch = to_numpy(get_action(naction))
 
-        # Add a flag to track if APF was applied
         is_apf_applied = (
                 self.obstacle_points is not None and len(self.obstacle_points) > 0
         )
 
-        # Apply APF if needed
         traj_batch = self.apply_repulsive_forces_to_trajectories(traj_batch)
         self._publish_action_msgs(traj_batch)
-
-        # 3. Publish visualisation image ------------------------------------
         self._publish_viz_image(traj_batch, is_apf_applied)
 
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
 
     def _publish_action_msgs(self, traj_batch: np.ndarray):
         sampled_actions_msg = Float32MultiArray()
@@ -425,14 +401,13 @@ class ExplorationNode(Node):
         self.waypoint_pub.publish(waypoint_msg)
 
     def _publish_viz_image(self, traj_batch: np.ndarray, is_apf_applied: bool = False):
-        frame = np.array(self.context_queue[-1])  # latest RGB frame
+        frame = np.array(self.context_queue[-1])
         img_h, img_w = frame.shape[:2]
         viz = frame.copy()
 
         cx = img_w // 2
         cy = int(img_h * 0.95)
 
-        # 수정사항:
         pixels_per_m = 3.0
         lateral_scale = 1.0
         robot_symbol_length = 10
@@ -443,40 +418,37 @@ class ExplorationNode(Node):
             (cx + robot_symbol_length, cy),
             (255, 0, 0),
             2,
-        )  # Blue
+        )
         cv2.line(
             viz,
             (cx, cy - robot_symbol_length),
             (cx, cy + robot_symbol_length),
             (255, 0, 0),
             2,
-        )  # Blue
+        )
 
         # Draw each trajectory
         for i, traj in enumerate(traj_batch):
             pts = []
-            # 첫 점을 로봇 위치(cx, cy)에서 시작하도록 수정
-            pts.append((cx, cy))  # 시작점은 로봇의 현재 위치
+            pts.append((cx, cy))
 
             acc_x, acc_y = 0.0, 0.0
             for dx, dy in traj:
                 acc_x += dx
                 acc_y += dy
-                # lateral_scale 적용하여 좌우로 더 넓게
-                px = int(cx - acc_y * pixels_per_m * lateral_scale)  # acc_y 사용
+                px = int(cx - acc_y * pixels_per_m * lateral_scale)
                 py = int(cy - acc_x * pixels_per_m)
                 pts.append((px, py))
 
             if len(pts) >= 2:
-                # Change colors when APF is applied
                 if is_apf_applied:
                     color = (
                         (0, 0, 255) if i == 0 else (180, 0, 255)
-                    )  # Blue for main, purple for others
+                    )
                 else:
                     color = (
                         (0, 255, 0) if i == 0 else (255, 200, 0)
-                    )  # Original green and yellow
+                    )
                 cv2.polylines(viz, [np.array(pts, dtype=np.int32)], False, color, 2)
 
         img_msg = self.bridge.cv2_to_imgmsg(viz, encoding="rgb8")
