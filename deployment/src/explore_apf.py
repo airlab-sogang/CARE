@@ -21,13 +21,12 @@ from utils import msg_to_pil, to_numpy, transform_images, load_model
 from vint_train.training.train_utils import get_action
 from topic_names import IMAGE_TOPIC, WAYPOINT_TOPIC, SAMPLED_ACTIONS_TOPIC
 
-from UniDepth.unidepth.utils.camera import Pinhole
-from UniDepth.unidepth.models import UniDepthV2
+from unidepth.utils.camera import Pinhole
+from unidepth.models import UniDepthV2
 
-# ------------------------------- CONSTANTS ----------------------------------
-THIS_DIR = Path(__file__).resolve().parent
-ROBOT_CONFIG_PATH = THIS_DIR / "../config/robot.yaml"
-MODEL_CONFIG_PATH = THIS_DIR / "../config/models.yaml"
+THIS_DIR = Path.cwd()
+ROBOT_CONFIG_PATH = THIS_DIR / "deployment/config/robot.yaml"
+MODEL_CONFIG_PATH = THIS_DIR / "deployment/config/models.yaml"
 
 with open(ROBOT_CONFIG_PATH, "r") as f:
     ROBOT_CONF = yaml.safe_load(f)
@@ -54,13 +53,11 @@ def _load_model(model_name: str, device: torch.device):
 
 
 class ExplorationNode(Node):
-    """ROS 2 node: image‑conditioned waypoint sampling + visualisation."""
 
     def __init__(self, args: argparse.Namespace):
         super().__init__("exploration")
         self.args = args
 
-        # Torch / model ------------------------------------------------------
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.get_logger().info(f"Using device: {self.device}")
 
@@ -119,8 +116,6 @@ class ExplorationNode(Node):
         self.current_waypoint = np.zeros(2)
         self.obstacle_points = None
         self.top_view_size = (400, 400)
-        # self.proximity_threshold = 0.8
-        # self.safety_margin = 0.17
 
         if args.robot == "locobot" or args.robot == "locobot2":
             self.safety_margin = 0.05
@@ -145,7 +140,9 @@ class ExplorationNode(Node):
         elif args.robot == "turtlebot4":
             self.DIM = (320, 200)
 
-        self._init_depth_model()
+        # Config에서 intrinsics path 가져오기
+        intrinsics_path = self._get_intrinsics_path_from_config()
+        self._init_depth_model(intrinsics_path)
 
         # 시작하기 전에 중요한 파라미터들 출력
         self.get_logger().info("=" * 60)
@@ -163,6 +160,7 @@ class ExplorationNode(Node):
         self.get_logger().info("-" * 60)
         self.get_logger().info("CAMERA CONFIGURATION:")
         self.get_logger().info(f"  - Image dimensions: {self.DIM}")
+        self.get_logger().info(f"  - Intrinsics path: {intrinsics_path}")
         self.get_logger().info(f"  - Camera matrix (K):\n{self.K}")
         self.get_logger().info("-" * 60)
         self.get_logger().info("MODEL CONFIGURATION:")
@@ -199,29 +197,44 @@ class ExplorationNode(Node):
         self.get_logger().info(f"  - Robot symbol length: 10 pixels")
         self.get_logger().info("=" * 60)
 
-    def _init_depth_model(self):
-        if self.args.robot == "locobot" or self.args.robot == "locobot2":
-            self.K = np.load("./UniDepth/assets/fisheye/fisheye_intrinsics.npy")
-            self.D = np.load("./UniDepth/assets/fisheye/fisheye_distortion.npy")
-            self.map1, self.map2 = cv2.fisheye.initUndistortRectifyMap(
-                self.K, self.D, np.eye(3), self.K, self.DIM, cv2.CV_16SC2
-            )
-        elif self.args.robot == "robomaster":
-            self.K = np.load("./UniDepth/assets/robomaster/intrinsics.npy")
-            self.map1, self.map2 = None, None
-        elif self.args.robot == "turtlebot4":
-            self.K = np.load("./UniDepth/assets/turtlebot4/intrinsics.npy")
-            self.map1, self.map2 = None, None
+    def _get_intrinsics_path_from_config(self) -> str:
+        """Config 파일에서 intrinsics path를 가져오는 함수"""
+        # robot.yaml에서 intrinsics path 가져오기
+        if "intrinsics_path" in ROBOT_CONF:
+            intrinsics_path = ROBOT_CONF["intrinsics_path"]
         else:
-            raise ValueError(f"Unsupported robot type: {self.args.robot}")
+            # 로봇 타입별로 기본 intrinsics path 설정
+            if self.args.robot == "locobot":
+                intrinsics_path = ROBOT_CONF.get("locobot_intrinsics_path",
+                                                 "intrinsic/locobot/intrinsics.npy")
+            elif self.args.robot == "robomaster":
+                intrinsics_path = ROBOT_CONF.get("robomaster_intrinsics_path",
+                                                 "intrinsic/robomaster/intrinsics.npy")
+            elif self.args.robot == "turtlebot4":
+                intrinsics_path = ROBOT_CONF.get("turtlebot4_intrinsics_path",
+                                                 "intrinsic/turtlebot4/intrinsics.npy")
+            else:
+                raise ValueError(f"No intrinsics path configured for robot type: {self.args.robot}")
 
-        # self.intrinsics_torch = torch.from_numpy(self.K).unsqueeze(0).to(self.device)
-        # self.camera = Pinhole(K=self.intrinsics_torch)
-        self.depth_model = (
-            UniDepthV2.from_pretrained("lpiccinelli/unidepth-v2-vits14")
-            .to(self.device)
-            .eval()
-        )
+        # 상대 경로를 절대 경로로 변환
+        if not os.path.isabs(intrinsics_path):
+            intrinsics_path = str(THIS_DIR / intrinsics_path)
+
+        return intrinsics_path
+
+    def _init_depth_model(self, intrinsics_path: str):
+        """Depth model과 camera intrinsics 초기화"""
+        if not intrinsics_path:
+            raise ValueError("Intrinsics path is not provided.")
+        if not os.path.exists(intrinsics_path):
+            raise FileNotFoundError(f"Intrinsics file not found: {intrinsics_path}")
+
+        self.K = np.load(intrinsics_path)
+        self.get_logger().info(f"Loaded camera intrinsics from: {intrinsics_path}")
+
+        # UniDepth 모델 초기화
+        self.depth_model = UniDepthV2.from_pretrained("lpiccinelli/unidepth-v2-vits14").to(self.device)
+        self.depth_model.eval()
 
     # ------------------------------------------------------------------
     # Callbacks
@@ -230,7 +243,7 @@ class ExplorationNode(Node):
     def _image_cb(self, msg: Image):
         now = self.get_clock().now()
         if (now - self.last_ctx_time).nanoseconds < self.ctx_dt * 1e9:
-            return  # 아직 0.25 s 안 지났으면 무시
+            return  # 아직 0.25 s 안 지났으면 무시
         self.context_queue.append(msg_to_pil(msg))
         self.last_ctx_time = now
         self.get_logger().info(
@@ -275,10 +288,10 @@ class ExplorationNode(Node):
         img_y = np.int32(self.top_view_size[1] - Z * self.top_view_resolution)
 
         valid = (
-            (img_x >= 0)
-            & (img_x < self.top_view_size[0])
-            & (img_y >= 0)
-            & (img_y < self.top_view_size[1])
+                (img_x >= 0)
+                & (img_x < self.top_view_size[0])
+                & (img_y >= 0)
+                & (img_y < self.top_view_size[1])
         )
 
         img_x = img_x[valid]
@@ -303,7 +316,7 @@ class ExplorationNode(Node):
             self.obstacle_points = None
 
     def compute_repulsive_force(
-        self, point: np.ndarray, obstacles: np.ndarray, influence_range=1.0
+            self, point: np.ndarray, obstacles: np.ndarray, influence_range=1.0
     ) -> np.ndarray:
         rep_force = np.zeros(2)
         if obstacles is None:
@@ -317,7 +330,7 @@ class ExplorationNode(Node):
         return rep_force
 
     def apply_repulsive_forces_to_trajectories(
-        self, trajectories: np.ndarray
+            self, trajectories: np.ndarray
     ) -> np.ndarray:
         if self.obstacle_points is None or len(self.obstacle_points) == 0:
             return trajectories
@@ -387,7 +400,7 @@ class ExplorationNode(Node):
 
         # Add a flag to track if APF was applied
         is_apf_applied = (
-            self.obstacle_points is not None and len(self.obstacle_points) > 0
+                self.obstacle_points is not None and len(self.obstacle_points) > 0
         )
 
         # Apply APF if needed
@@ -477,7 +490,7 @@ class ExplorationNode(Node):
 
 
 def main():
-    parser = argparse.ArgumentParser("GNM‑Diffusion exploration (ROS 2)")
+    parser = argparse.ArgumentParser("GNM‑Diffusion exploration (ROS 2)")
     parser.add_argument("--model", "-m", default="nomad")
     parser.add_argument("--waypoint", "-w", type=int, default=2)
     parser.add_argument("--num-samples", "-n", type=int, default=8)
