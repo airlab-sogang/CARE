@@ -7,5 +7,7 @@ graph_rate: 0.3333 # Hz
 
 # topic names (modify for different robots/nodes)
 vel_teleop_topic: /cmd_vel_mux/input/teleop
-vel_navi_topic: /robot2/cmd_vel
+#vel_navi_topic: /robot1/cmd_vel #locobot
+#vel_navi_topic: /robot2/cmd_vel #turtlebot4
+vel_navi_topic: /cmd_vel #robomaster
 vel_recovery_topic: /cmd_vel_mux/input/recovery
