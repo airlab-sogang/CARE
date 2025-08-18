@@ -169,9 +169,6 @@ class NavigationNode(Node):
         self.get_logger().info("-" * 60)
         self.get_logger().info("CAMERA CONFIGURATION:")
         self.get_logger().info(f"  - Image dimensions: {self.DIM}")
-        self.get_logger().info(f"  - Camera matrix (K):\n{self.K}")
-        if self.args.robot == "locobot":
-            self.get_logger().info(f"  - Distortion coefficients (D):\n{self.D}")
         self.get_logger().info("-" * 60)
         self.get_logger().info("MODEL CONFIGURATION:")
         self.get_logger().info(f"  - Model name: {self.args.model}")

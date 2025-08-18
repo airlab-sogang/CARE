@@ -95,7 +95,7 @@ def load_model(
     else:
         raise ValueError(f"Invalid model type: {model_type}")
     
-    checkpoint = torch.load(model_path, map_location=device)
+    checkpoint = torch.load(model_path, map_location=device, weights_only=False)
     if model_type == "nomad":
         state_dict = checkpoint
         model.load_state_dict(state_dict, strict=False)
