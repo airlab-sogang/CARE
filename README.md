@@ -46,7 +46,7 @@ cd CARE
 ```bash
 # Install core dependencies
 pip install -e UniDepth/ --extra-index-url https://download.pytorch.org/whl/cu118
-pip install -e visualnav-transformer/train/
+pip install -e train/
 pip install -e diffusion_policy/
 
 # Install additional packages
