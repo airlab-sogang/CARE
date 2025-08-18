@@ -1,6 +1,6 @@
 # CARE: Collision Avoidance via Repulsive Estimation
 
-**CoRL 2025** | [Project Page](https://airlab-sogang.github.io/CARE/) | [Paper](link-to-paper) | [Video](link-to-video)
+**CoRL 2025** | [Project Page](https://airlab-sogang.github.io/CARE/) | [Paper](https://arxiv.org/abs/2506.03834) | [Video](https://www.youtube.com/watch?v=OrncVUgph6o)
 
 ## 📋 Overview
 
