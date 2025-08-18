@@ -68,8 +68,8 @@ unidepth 0.1 requires numpy>=2.0.0, but you have numpy 1.26.4 which is incompati
 
 ### ⚠️ Important: Two-Process Architecture
 CARE requires running two processes simultaneously:
-1. **PD Controller** (Terminal 1) - Handles robot control wutg PD controller
-2. **Navigation Modes** (Terminal 2) - Provides waypoint generation
+1. **PD Controller** (Terminal 1) - Handles robot control with PD controller
+2. **Navigation/Exploration Module** (Terminal 2) - Provides waypoint generation
 
 ### Supported Robot Platforms
 - **LoCoBot** - 170° FOV fisheye camera
@@ -83,6 +83,10 @@ Autonomous exploration with collision avoidance:
 
 **Terminal 1 (PD Controller):**
 ```bash
+# Standard exploration
+python deployment/src/pd_controller.py --control nomad --robot [ROBOT_TYPE]
+
+# CARE-enhanced exploration
 python deployment/src/pd_controller.py --control care --robot [ROBOT_TYPE]
 ```
 
@@ -91,23 +95,51 @@ python deployment/src/pd_controller.py --control care --robot [ROBOT_TYPE]
 # Standard exploration
 python deployment/src/explore.py --waypoint 2 --robot [ROBOT_TYPE]
 
-# CARE-enhanced exploration (recommended)
+# CARE-enhanced exploration
 python deployment/src/explore_care.py --waypoint 2 --robot [ROBOT_TYPE]
 ```
 
 #### 2. Goal-Conditioned Navigation
-Navigate to specific image goals:
+Navigate using topological maps with ViNT or NoMaD models:
 
 **Terminal 1 (PD Controller - Required):**
 ```bash
+# Standard navigation
+python deployment/src/pd_controller.py --control nomad --robot [ROBOT_TYPE]
+
+# CARE-enhanced navigation
 python deployment/src/pd_controller.py --control care --robot [ROBOT_TYPE]
 ```
 
-**Terminal 2:**
+**Terminal 2 (Choose one):**
 ```bash
-# With goal image
-python deployment/src/explore_care.py --waypoint 2 --robot [ROBOT_TYPE] --goal_image path/to/goal.jpg
+# Standard goal-conditioned navigation
+python deployment/src/navigate.py \
+    --waypoint 2 \
+    --dir [TOPOMAP_DIR] \
+    --model [MODEL_TYPE] \
+    --robot [ROBOT_TYPE]
+
+# CARE-enhanced goal-conditioned navigation
+python deployment/src/navigate_care.py \
+    --waypoint 2 \
+    --dir [TOPOMAP_DIR] \
+    --model [MODEL_TYPE] \
+    --robot [ROBOT_TYPE]
 ```
+
+### Parameters
+
+#### Common Parameters
+- `--waypoint`: Number of waypoints for navigation (default: 2)
+- `--robot`: Robot platform (`locobot`, `robomaster`, `turtlebot4`)
+
+#### PD Controller Parameters
+- `--control`: Control method (`nomad`, `care`)
+
+#### Navigation-specific Parameters
+- `--dir`: Directory containing the topological map (e.g., `topomap_locobot`)
+- `--model`: Navigation model to use (`vint`, `nomad`)
 
 ### Complete Usage Examples
 
@@ -120,40 +152,80 @@ python deployment/src/pd_controller.py --control care --robot locobot
 python deployment/src/explore_care.py --waypoint 2 --robot locobot
 ```
 
-#### Example 2: TurtleBot4 Standard Navigation
+#### Example 2: TurtleBot4 Standard Exploration
 ```bash
 # Terminal 1 (keep running)
-python deployment/src/pd_controller.py --control care --robot turtlebot4
+python deployment/src/pd_controller.py --control nomad --robot turtlebot4
 
 # Terminal 2
 python deployment/src/explore.py --waypoint 2 --robot turtlebot4
 ```
 
-#### Example 3: RoboMaster Goal-Conditioned Navigation
+#### Example 3: LoCoBot Goal-Conditioned Navigation with ViNT (Standard)
+```bash
+# Terminal 1 (keep running)
+python deployment/src/pd_controller.py --control nomad --robot locobot
+
+# Terminal 2
+python deployment/src/navigate.py \
+    --waypoint 2 \
+    --dir topomap_locobot \
+    --model vint \
+    --robot locobot
+```
+
+#### Example 4: LoCoBot Goal-Conditioned Navigation with ViNT (CARE-Enhanced)
+```bash
+# Terminal 1 (keep running)
+python deployment/src/pd_controller.py --control care --robot locobot
+
+# Terminal 2
+python deployment/src/navigate_care.py \
+    --waypoint 2 \
+    --dir topomap_locobot \
+    --model vint \
+    --robot locobot
+```
+
+#### Example 5: RoboMaster Goal-Conditioned Navigation with NoMaD (CARE-Enhanced)
 ```bash
 # Terminal 1 (keep running)
 python deployment/src/pd_controller.py --control care --robot robomaster
 
 # Terminal 2
-python deployment/src/explore_care.py --waypoint 2 --robot robomaster
+python deployment/src/navigate_care.py \
+    --waypoint 2 \
+    --dir topomap_robomaster \
+    --model nomad \
+    --robot robomaster
 ```
 
-### Parameters
-- `--waypoint`: Number of waypoints for exploration (default: 2)
-- `--robot`: Robot platform (`locobot`, `robomaster`, `turtlebot4`)
-- `--control`: Control method for PD controller (`nomad`, `apf`)
+#### Example 6: TurtleBot4 Goal-Conditioned Navigation with NoMaD (Standard)
+```bash
+# Terminal 1 (keep running)
+python deployment/src/pd_controller.py --control nomad --robot turtlebot4
+
+# Terminal 2
+python deployment/src/navigate.py \
+    --waypoint 2 \
+    --dir topomap_turtlebot4 \
+    --model nomad \
+    --robot turtlebot4
+```
 
 ## 🏗️ Architecture
 
 CARE uses a two-process architecture for robust navigation:
 
 ### Process 1: PD Controller
-- Receives waypoints from the navigation module
+- Receives waypoints from the navigation/exploration module
 - Directly controls robot motors with collision-free commands
+- Can operate in standard (`nomad`) or CARE-enhanced (`care`) mode
 
-### Process 2: Navigation Module (explore.py or explore_care.py)
-- Generates waypoints using vision-based models (ViNT/NoMaD)
-- CARE-enhanced version adds depth-based trajectory adjustment
+### Process 2: Navigation/Exploration Module
+- **Exploration** (`explore.py` / `explore_care.py`): Generates waypoints for autonomous exploration
+- **Goal-Conditioned Navigation** (`navigate.py` / `navigate_care.py`): Uses topological maps and vision models (ViNT/NoMaD) for targeted navigation
+- CARE-enhanced versions add depth-based trajectory adjustment
 - Sends waypoints to PD controller for execution
 
 ### CARE Pipeline
@@ -162,6 +234,10 @@ RGB Image → Depth Estimation → Top-down Map → Repulsive Forces → Adjuste
                                                                             ↓
 Robot ← PD Controller ← Waypoints ←────────────────────────────────
 ```
+
+### Navigation Models
+- **ViNT**: Visual Navigation Transformer for goal-conditioned navigation
+- **NoMaD**: No Maps, No Problem - Exploration and navigation without explicit mapping
 
 ## 📝 Citation
 
