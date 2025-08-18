@@ -5,5 +5,5 @@ max_w: 0.8 #0.8 # rad/s
 frame_rate: 4 # Hz
 graph_rate: 0.3333 # Hz
 
-# topic names (modify for different robots/nodes)
+# intrinsic path
 intrinsics_path: intrinsic/locobot/intrinsics.npy
