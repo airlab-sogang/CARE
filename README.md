@@ -56,28 +56,12 @@ pip install -e diffusion_policy/
 pip install rospkg efficientnet_pytorch warmup_scheduler diffusers vit-pytorch
 pip install --upgrade "numpy<2,>=1.26"
 ```
+Note: The following pip dependency resolver message may appear after installation. It does not affect running this project and can be safely ignored.
 
-## 🚀 Quick Start
-
-### Important: Two-Terminal Setup Required
-**You need to run two programs simultaneously in separate terminals:**
-
-#### Terminal 1: PD Controller (Required)
-```bash
-# This must be running for any navigation mode
-python deployment/src/pd_controller.py --control care --robot locobot
 ```
-
-#### Terminal 2: Navigation Mode (Choose one)
-
-**Standard Navigation (Baseline)**
-```bash
-python deployment/src/explore.py --waypoint 2 --robot locobot
-```
-
-**CARE-Enhanced Navigation (Recommended)**
-```bash
-python deployment/src/explore_care.py --waypoint 2 --robot locobot
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+robomaster 0.1.1.65 requires netifaces>=0.10, which is not installed.
+unidepth 0.1 requires numpy>=2.0.0, but you have numpy 1.26.4 which is incompatible.
 ```
 
 ## 📖 Usage
@@ -85,7 +69,7 @@ python deployment/src/explore_care.py --waypoint 2 --robot locobot
 ### ⚠️ Important: Two-Process Architecture
 CARE requires running two processes simultaneously:
 1. **PD Controller** (Terminal 1) - Handles robot control wutg PD controller
-2. **Navigation Module** (Terminal 2) - Provides waypoint generation
+2. **Navigation Modes** (Terminal 2) - Provides waypoint generation
 
 ### Supported Robot Platforms
 - **LoCoBot** - 170° FOV fisheye camera
@@ -97,7 +81,7 @@ CARE requires running two processes simultaneously:
 #### 1. Exploration Mode
 Autonomous exploration with collision avoidance:
 
-**Terminal 1 (PD Controller - Required):**
+**Terminal 1 (PD Controller):**
 ```bash
 python deployment/src/pd_controller.py --control care --robot [ROBOT_TYPE]
 ```
