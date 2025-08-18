@@ -65,7 +65,7 @@ pip install --upgrade "numpy<2,>=1.26"
 #### Terminal 1: PD Controller (Required)
 ```bash
 # This must be running for any navigation mode
-python pd_controller.py --control apf --robot locobot
+python pd_controller.py --control care --robot locobot
 ```
 
 #### Terminal 2: Navigation Mode (Choose one)
@@ -84,7 +84,7 @@ python explore_care.py --waypoint 2 --robot locobot
 
 ### ⚠️ Important: Two-Process Architecture
 CARE requires running two processes simultaneously:
-1. **PD Controller** (Terminal 1) - Handles robot control with APF
+1. **PD Controller** (Terminal 1) - Handles robot control wutg PD controller
 2. **Navigation Module** (Terminal 2) - Provides waypoint generation
 
 ### Supported Robot Platforms
@@ -99,7 +99,7 @@ Autonomous exploration with collision avoidance:
 
 **Terminal 1 (PD Controller - Required):**
 ```bash
-python pd_controller.py --control apf --robot [ROBOT_TYPE]
+python pd_controller.py --control care --robot [ROBOT_TYPE]
 ```
 
 **Terminal 2 (Choose one):**
@@ -116,7 +116,7 @@ Navigate to specific image goals:
 
 **Terminal 1 (PD Controller - Required):**
 ```bash
-python pd_controller.py --control apf --robot [ROBOT_TYPE]
+python pd_controller.py --control care --robot [ROBOT_TYPE]
 ```
 
 **Terminal 2:**
@@ -130,7 +130,7 @@ python explore_care.py --waypoint 2 --robot [ROBOT_TYPE] --goal_image path/to/go
 #### Example 1: LoCoBot CARE-Enhanced Exploration
 ```bash
 # Terminal 1 (keep running)
-python pd_controller.py --control apf --robot locobot
+python pd_controller.py --control care --robot locobot
 
 # Terminal 2
 python explore_care.py --waypoint 2 --robot locobot
@@ -139,7 +139,7 @@ python explore_care.py --waypoint 2 --robot locobot
 #### Example 2: TurtleBot4 Standard Navigation
 ```bash
 # Terminal 1 (keep running)
-python pd_controller.py --control apf --robot turtlebot4
+python pd_controller.py --control care --robot turtlebot4
 
 # Terminal 2
 python explore.py --waypoint 2 --robot turtlebot4
@@ -148,7 +148,7 @@ python explore.py --waypoint 2 --robot turtlebot4
 #### Example 3: RoboMaster Goal-Conditioned Navigation
 ```bash
 # Terminal 1 (keep running)
-python pd_controller.py --control apf --robot robomaster
+python pd_controller.py --control care --robot robomaster
 
 # Terminal 2
 python explore_care.py --waypoint 2 --robot robomaster
@@ -157,15 +157,14 @@ python explore_care.py --waypoint 2 --robot robomaster
 ### Parameters
 - `--waypoint`: Number of waypoints for exploration (default: 2)
 - `--robot`: Robot platform (`locobot`, `robomaster`, `turtlebot4`)
-- `--control`: Control method for PD controller (always use `apf`)
+- `--control`: Control method for PD controller (`nomad`, `apf`)
 
 ## 🏗️ Architecture
 
 CARE uses a two-process architecture for robust navigation:
 
-### Process 1: PD Controller with APF
+### Process 1: PD Controller
 - Receives waypoints from the navigation module
-- Applies Artificial Potential Field (APF) for local obstacle avoidance
 - Directly controls robot motors with collision-free commands
 
 ### Process 2: Navigation Module (explore.py or explore_care.py)
@@ -177,7 +176,7 @@ CARE uses a two-process architecture for robust navigation:
 ```
 RGB Image → Depth Estimation → Top-down Map → Repulsive Forces → Adjusted Trajectory
                                                                             ↓
-Robot ← PD Controller (APF) ← Waypoints ←────────────────────────────────
+Robot ← PD Controller ← Waypoints ←────────────────────────────────
 ```
 
 ## 📝 Citation
