@@ -113,7 +113,8 @@ class NavigationNode(Node):
         elif args.robot == "turtlebot4":
             self.DIM = (320, 200)
 
-        self._init_depth_model()
+        intrinsics_path = self._get_intrinsics_path_from_config()
+        self._init_depth_model(intrinsics_path)
 
         self.topomap: List[PILImage] = self._load_topomap(args.dir)
         self.goal_node = (
@@ -236,6 +237,27 @@ class NavigationNode(Node):
         self.get_logger().info(f"  - Origin Y ratio: {ORIGIN_Y_RATIO}")
         self.get_logger().info("=" * 60)
 
+    def _get_intrinsics_path_from_config(self) -> str:
+        if "intrinsics_path" in ROBOT_CONF:
+            intrinsics_path = ROBOT_CONF["intrinsics_path"]
+        else:
+            if self.args.robot == "locobot":
+                intrinsics_path = ROBOT_CONF.get("locobot_intrinsics_path",
+                                                 "intrinsic/locobot/intrinsics.npy")
+            elif self.args.robot == "robomaster":
+                intrinsics_path = ROBOT_CONF.get("robomaster_intrinsics_path",
+                                                 "intrinsic/robomaster/intrinsics.npy")
+            elif self.args.robot == "turtlebot4":
+                intrinsics_path = ROBOT_CONF.get("turtlebot4_intrinsics_path",
+                                                 "intrinsic/turtlebot4/intrinsics.npy")
+            else:
+                raise ValueError(f"No intrinsics path configured for robot type: {self.args.robot}")
+
+        if not os.path.isabs(intrinsics_path):
+            intrinsics_path = str(THIS_DIR / intrinsics_path)
+
+        return intrinsics_path
+
     def _load_topomap(self, subdir: str) -> List[PILImage.Image]:
         dpath = TOPOMAP_IMAGES_DIR / subdir
         if not dpath.exists():
@@ -243,27 +265,17 @@ class NavigationNode(Node):
         img_files = sorted(os.listdir(dpath), key=lambda x: int(os.path.splitext(x)[0]))
         return [PILImage.open(dpath / f) for f in img_files]
 
-    def _init_depth_model(self):
-        if self.args.robot == "locobot":
-            self.K = np.load("./UniDepth/assets/fisheye/fisheye_intrinsics.npy")
-            self.D = np.load("./UniDepth/assets/fisheye/fisheye_distortion.npy")
-            self.map1, self.map2 = cv2.fisheye.initUndistortRectifyMap(
-                self.K, self.D, np.eye(3), self.K, self.DIM, cv2.CV_16SC2
-            )
-        elif self.args.robot == "robomaster":
-            self.K = np.load("./UniDepth/assets/robomaster/intrinsics.npy")
-            self.map1, self.map2 = None, None
-        elif self.args.robot == "turtlebot4":
-            self.K = np.load("./UniDepth/assets/turtlebot4/intrinsics.npy")
-            self.map1, self.map2 = None, None
-        else:
-            raise ValueError(f"Unsupported robot type: {self.args.robot}")
+    def _init_depth_model(self, intrinsics_path: str):
+        if not intrinsics_path:
+            raise ValueError("Intrinsics path is not provided.")
+        if not os.path.exists(intrinsics_path):
+            raise FileNotFoundError(f"Intrinsics file not found: {intrinsics_path}")
 
-        self.depth_model = (
-            UniDepthV2.from_pretrained("lpiccinelli/unidepth-v2-vits14")
-            .to(self.device)
-            .eval()
-        )
+        self.K = np.load(intrinsics_path)
+        self.get_logger().info(f"Loaded camera intrinsics from: {intrinsics_path}")
+
+        self.depth_model = UniDepthV2.from_pretrained("lpiccinelli/unidepth-v2-vits14").to(self.device)
+        self.depth_model.eval()
 
     def _image_cb(self, msg: Image):
         now = self.get_clock().now()

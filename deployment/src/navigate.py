@@ -92,8 +92,6 @@ class NavigationNode(Node):
         self.safety_margin = 0.17
         self.DIM = (640, 480)
 
-        self._init_depth_model()
-
         # Topological map ----------------------------------------------------
         self.topomap: List[PILImage] = self._load_topomap(args.dir)
         self.goal_node = (
@@ -221,20 +219,6 @@ class NavigationNode(Node):
             raise FileNotFoundError(f"Topomap directory {dpath} does not exist")
         img_files = sorted(os.listdir(dpath), key=lambda x: int(os.path.splitext(x)[0]))
         return [PILImage.open(dpath / f) for f in img_files]
-
-    def _init_depth_model(self):
-        self.K = np.load("./UniDepth/assets/fisheye/fisheye_intrinsics.npy")
-        self.D = np.load("./UniDepth/assets/fisheye/fisheye_distortion.npy")
-        self.map1, self.map2 = cv2.fisheye.initUndistortRectifyMap(
-            self.K, self.D, np.eye(3), self.K, self.DIM, cv2.CV_16SC2
-        )
-        self.intrinsics_torch = torch.from_numpy(self.K).unsqueeze(0).to(self.device)
-        self.camera = Pinhole(K=self.intrinsics_torch)
-        self.depth_model = (
-            UniDepthV2.from_pretrained("lpiccinelli/unidepth-v2-vits14")
-            .to(self.device)
-            .eval()
-        )
 
     def _image_cb(self, msg: Image):
         now = self.get_clock().now()
