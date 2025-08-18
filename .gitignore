@@ -150,5 +150,3 @@ dmypy.json
 
 # Pycharm
 .idea/
-/diffusion_policy/
-/train/

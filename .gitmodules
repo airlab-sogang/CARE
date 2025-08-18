@@ -1,0 +1,9 @@
+[submodule "UniDepth"]
+	path = UniDepth
+	url = https://github.com/lpiccinelli-eth/UniDepth.git
+[submodule "train"]
+	path = train
+	url = https://github.com/robodhruv/visualnav-transformer.git
+[submodule "diffusion_policy"]
+	path = diffusion_policy
+	url = https://github.com/real-stanford/diffusion_policy.git
