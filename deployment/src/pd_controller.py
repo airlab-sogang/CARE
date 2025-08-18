@@ -33,7 +33,6 @@ with open(CONFIG_PATH, "r") as f:
 
 MAX_V: float = robot_cfg["max_v"]
 MAX_W: float = robot_cfg["max_w"]
-VEL_TOPIC: str = robot_cfg["vel_navi_topic"]
 DT: float = 1.0 / robot_cfg["frame_rate"]
 
 RATE: int = 4
