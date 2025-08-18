@@ -1,178 +1,196 @@
-# Robot Navigation Project
+# CARE: Collision Avoidance via Repulsive Estimation
 
-This repository contains the implementation of CARE: Enhancing Safety of Visual Navigation through Collision Avoidance via Repulsive Estimation, accepted to CoRL 2025.
+**CoRL 2025** | [Project Page](https://airlab-sogang.github.io/CARE/) | [Paper](link-to-paper) | [Video](link-to-video)
 
-## Environment Setup
+## 📋 Overview
 
-### 1. Create Conda Environment
+CARE (Collision Avoidance via Repulsive Estimation) is a plug-and-play safety module that enhances visual navigation models without requiring fine-tuning or additional sensors. By combining monocular depth estimation with reactive planning based on Artificial Potential Fields (APF), CARE significantly improves collision avoidance for robots navigating in out-of-distribution environments.
 
+### Key Features
+- 🚀 **Zero-shot deployment** - Works without fine-tuning on new environments
+- 🔌 **Plug-and-play** - Compatible with any RGB-based navigation model (ViNT, NoMaD, etc.)
+- 📷 **Vision-only** - Requires only RGB camera input, no additional sensors
+- 🤖 **Multi-robot support** - Tested on LoCoBot, TurtleBot4, and RoboMaster platforms
+- ⚡ **Real-time performance** - Lightweight depth estimation with minimal computational overhead
+
+### Performance Highlights
+- **100% collision reduction** in goal-conditioned navigation tasks
+- **10.7× improvement** in collision-free travel distance during exploration
+- Maintains navigation efficiency while significantly improving safety
+
+## 🛠️ Installation
+
+### Prerequisites
+- Ubuntu 20.04 or 22.04
+- Python 3.10
+- CUDA 11.8 compatible GPU
+- Conda package manager
+- ROS2 (for robot deployment)
+- Two terminal windows (for concurrent PD controller and navigation execution)
+
+### Quick Setup
+
+1. **Create Conda Environment**
 ```bash
-# Create conda environment with Python 3.10
 conda create -n CARE python=3.10
 conda activate CARE
 ```
 
-### 2. Clone and Install Core Dependencies
-
+2. **Clone Repository with Submodules**
 ```bash
-# Clone and install UniDepth
-git clone https://github.com/lpiccinelli-eth/UniDepth.git
-pip install -e UniDepth/ --extra-index-url https://download.pytorch.org/whl/cu118
-
-# Clone and install visualnav-transformer
-git clone https://github.com/robodhruv/visualnav-transformer.git
-pip install -e train/
-
-# Clone and install diffusion_policy
-git clone https://github.com/real-stanford/diffusion_policy.git
-pip install -e diffusion_policy/
+git clone --recursive https://github.com/airlab-sogang/CARE.git
+cd CARE
 ```
 
-### 3. Install Additional Dependencies
-
+3. **Install Dependencies**
 ```bash
-# Install Python packages
-pip install rospkg
-pip install efficientnet_pytorch warmup_scheduler diffusers
-pip install vit-pytorch
+# Install core dependencies
+pip install -e UniDepth/ --extra-index-url https://download.pytorch.org/whl/cu118
+pip install -e visualnav-transformer/train/
+pip install -e diffusion_policy/
+
+# Install additional packages
+pip install rospkg efficientnet_pytorch warmup_scheduler diffusers vit-pytorch
 
 # Install conda packages
-conda install conda-forge::opencv -y
-conda install conda-forge::einops -y
-conda install conda-forge::wandb -y
-conda install conda-forge::prettytable -y
-
-# Install numpy with version constraint
-conda install "numpy<2,>=1.26" -y
+conda install conda-forge::opencv conda-forge::einops conda-forge::wandb \
+              conda-forge::prettytable "numpy<2,>=1.26" -y
 ```
 
-### 4. Fix Diffusion Policy Installation (if needed)
+## 🚀 Quick Start
 
-If you encounter issues with diffusion_policy, ensure the package structure is correct:
+### Important: Two-Terminal Setup Required
+**You need to run two programs simultaneously in separate terminals:**
 
+#### Terminal 1: PD Controller (Required)
 ```bash
-# Verify the structure exists:
-# visualnav-transformer-test/
-#   diffusion_policy/
-#     setup.py or pyproject.toml
-#     diffusion_policy/
-#       __init__.py        <-- Should exist
-#       model/
-#         diffusion/
-#           conditional_unet1d.py  <-- Should exist
-
-# Reinstall if needed
-pip install -e diffusion_policy/
+# This must be running for any navigation mode
+python pd_controller.py --control apf --robot locobot
 ```
 
-## Quick Start
+#### Terminal 2: Navigation Mode (Choose one)
 
-This project provides two main exploration modes:
-
-### Standard Exploration
+**Standard Navigation (Baseline)**
 ```bash
-python explore.py --waypoint 2 --robot [ROBOT_TYPE]
+python explore.py --waypoint 2 --robot locobot
 ```
 
-### Care-Enhanced Exploration
+**CARE-Enhanced Navigation (Recommended)**
 ```bash
-python explore_care.py --waypoint 2 --robot [ROBOT_TYPE]
+python explore_care.py --waypoint 2 --robot locobot
 ```
 
-### PD Controller (Optional)
+## 📖 Usage
+
+### ⚠️ Important: Two-Process Architecture
+CARE requires running two processes simultaneously:
+1. **PD Controller** (Terminal 1) - Handles robot control with APF
+2. **Navigation Module** (Terminal 2) - Provides waypoint generation
+
+### Supported Robot Platforms
+- **LoCoBot** - 170° FOV fisheye camera
+- **TurtleBot4** - 89.5° FOV OAK-D Pro camera
+- **RoboMaster S1** - 120° FOV camera
+
+### Navigation Modes
+
+#### 1. Exploration Mode
+Autonomous exploration with collision avoidance:
+
+**Terminal 1 (PD Controller - Required):**
 ```bash
 python pd_controller.py --control apf --robot [ROBOT_TYPE]
 ```
 
-## Supported Robots
-
-The project supports three robot platforms:
-- **locobot** - LoCoBot robot platform
-- **robomaster** - DJI RoboMaster robot
-- **turtlebot4** - TurtleBot 4 robot platform
-
-## Usage Examples
-
-### Standard Exploration Examples
+**Terminal 2 (Choose one):**
 ```bash
-# LoCoBot exploration
-python explore.py --waypoint 2 --robot locobot
+# Standard exploration
+python explore.py --waypoint 2 --robot [ROBOT_TYPE]
 
-# RoboMaster exploration  
-python explore.py --waypoint 2 --robot robomaster
+# CARE-enhanced exploration (recommended)
+python explore_care.py --waypoint 2 --robot [ROBOT_TYPE]
+```
 
-# TurtleBot4 exploration
+#### 2. Goal-Conditioned Navigation
+Navigate to specific image goals:
+
+**Terminal 1 (PD Controller - Required):**
+```bash
+python pd_controller.py --control apf --robot [ROBOT_TYPE]
+```
+
+**Terminal 2:**
+```bash
+# With goal image
+python explore_care.py --waypoint 2 --robot [ROBOT_TYPE] --goal_image path/to/goal.jpg
+```
+
+### Complete Usage Examples
+
+#### Example 1: LoCoBot CARE-Enhanced Exploration
+```bash
+# Terminal 1 (keep running)
+python pd_controller.py --control apf --robot locobot
+
+# Terminal 2
+python explore_care.py --waypoint 2 --robot locobot
+```
+
+#### Example 2: TurtleBot4 Standard Navigation
+```bash
+# Terminal 1 (keep running)
+python pd_controller.py --control apf --robot turtlebot4
+
+# Terminal 2
 python explore.py --waypoint 2 --robot turtlebot4
 ```
 
-### Care-Enhanced Exploration Examples
+#### Example 3: RoboMaster Goal-Conditioned Navigation
 ```bash
-# LoCoBot with care features
-python explore_care.py --waypoint 2 --robot locobot
+# Terminal 1 (keep running)
+python pd_controller.py --control apf --robot robomaster
 
-# RoboMaster with care features
+# Terminal 2
 python explore_care.py --waypoint 2 --robot robomaster
-
-# TurtleBot4 with care features
-python explore_care.py --waypoint 2 --robot turtlebot4
 ```
 
-## Exploration Modes
-
-- **explore.py**: Standard navigation and exploration using APF
-- **explore_care.py**: Enhanced exploration with additional care features (collision avoidance, safety protocols, etc.)
-
-## Prerequisites
-
-- Python 3.10
-- Conda package manager
-- CUDA 11.8 compatible GPU (for PyTorch installation)
-- Robot hardware setup for chosen platform
-
-## Installation Summary
-
-1. Set up conda environment (see Environment Setup section above)
-2. Clone this repository
-3. Ensure all dependencies are installed following the Environment Setup steps
-
-## Parameters
-
+### Parameters
 - `--waypoint`: Number of waypoints for exploration (default: 2)
-- `--robot`: Robot type (`locobot`, `robomaster`, or `turtlebot4`)
-- `--control`: Control method (use 'apf' for Artificial Potential Field)
+- `--robot`: Robot platform (`locobot`, `robomaster`, `turtlebot4`)
+- `--control`: Control method for PD controller (always use `apf`)
 
-## Project Structure
+## 🏗️ Architecture
 
-The project consists of main components:
+CARE uses a two-process architecture for robust navigation:
 
-- **Exploration Modules**:
-    - `explore.py` - Standard waypoint navigation using APF
-    - `explore_care.py` - Enhanced navigation with care features
-- **PD Controller**: Provides control mechanisms using APF for various robots
+### Process 1: PD Controller with APF
+- Receives waypoints from the navigation module
+- Applies Artificial Potential Field (APF) for local obstacle avoidance
+- Directly controls robot motors with collision-free commands
 
-## Troubleshooting
+### Process 2: Navigation Module (explore.py or explore_care.py)
+- Generates waypoints using vision-based models (ViNT/NoMaD)
+- CARE-enhanced version adds depth-based trajectory adjustment
+- Sends waypoints to PD controller for execution
 
-### Common Issues
-
-1. **PyTorch CUDA Issues**: Ensure CUDA 11.8 is installed and compatible with your GPU
-2. **Diffusion Policy Import Errors**: Verify the package structure and `__init__.py` files exist
-3. **NumPy Version Conflicts**: Use the specified numpy version constraint: `"numpy<2,>=1.26"`
-
-### Environment Verification
-
-To verify your environment is set up correctly:
-
-```bash
-conda activate CARE
-python -c "import torch; print(f'PyTorch version: {torch.__version__}')"
-python -c "import cv2; print(f'OpenCV version: {cv2.__version__}')"
-python -c "import numpy; print(f'NumPy version: {numpy.__version__}')"
+### CARE Pipeline
+```
+RGB Image → Depth Estimation → Top-down Map → Repulsive Forces → Adjusted Trajectory
+                                                                            ↓
+Robot ← PD Controller (APF) ← Waypoints ←────────────────────────────────
 ```
 
-## License
+## 📝 Citation
 
-[Add your license information here]
+If you find this work useful, please cite our paper:
 
-## Contributing
+```bibtex
+@inproceedings{care2025,
+  title={CARE: Enhancing Safety of Visual Navigation through Collision Avoidance via Repulsive Estimation},
+  author={Kim, Joonkyung and Sim, Joonyeol and Kim, Woojun and Sycara, Katia and Nam, Changjoo},
+  booktitle={Conference on Robot Learning (CoRL)},
+  year={2025}
+}
+```
 
-[Add contributing guidelines here]
+**Project Page**: https://airlab-sogang.github.io/CARE/
