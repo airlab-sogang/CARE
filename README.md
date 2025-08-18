@@ -50,7 +50,7 @@ conda install -c conda-forge opencv einops wandb prettytable -y
 # Install core dependencies
 pip install -e UniDepth/ --extra-index-url https://download.pytorch.org/whl/cu118
 pip install -e train/
-pip install -e diffusion_policy/
+pip install -e diffusion_policy/ --config-settings editable_mode=compat
 
 # Install additional packages
 pip install rospkg efficientnet_pytorch warmup_scheduler diffusers vit-pytorch
