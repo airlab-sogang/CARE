@@ -21,14 +21,10 @@ from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
 
 from utils import msg_to_pil, to_numpy, transform_images, load_model
 from vint_train.training.train_utils import get_action
-from topic_names import IMAGE_TOPIC, WAYPOINT_TOPIC, SAMPLED_ACTIONS_TOPIC
 
 from UniDepth.unidepth.models import UniDepthV2
 from UniDepth.unidepth.utils.camera import Pinhole
 
-# ---------------------------------------------------------------------------
-# CONFIG & CONSTANTS
-# ---------------------------------------------------------------------------
 THIS_DIR = Path(__file__).resolve().parent
 ROBOT_CONFIG_PATH = THIS_DIR / "../config/robot.yaml"
 MODEL_CONFIG_PATH = THIS_DIR / "../config/models.yaml"
@@ -40,11 +36,8 @@ MAX_V = ROBOT_CONF["max_v"]
 MAX_W = ROBOT_CONF["max_w"]
 RATE = ROBOT_CONF["frame_rate"]  # Hz
 
-# Visualisation -------------------------------------------------------------
 PIXELS_PER_M = 60.0  # px for 1 m (feel free to tune)
 ORIGIN_Y_RATIO = 0.95  # where to anchor trajectories vertically
-
-# ---------------------------------------------------------------------------
 
 
 def _load_model(model_name: str, device: torch.device):
@@ -80,7 +73,6 @@ class NavigationNode(Node):
 
         self.context_size: int = self.model_params["context_size"]
 
-        # NOMAD 모델인 경우에만 noise_scheduler 초기화
         if self.model_params["model_type"] == "nomad":
             self.noise_scheduler = DDPMScheduler(
                 num_train_timesteps=self.model_params["num_diffusion_iters"],
@@ -114,7 +106,6 @@ class NavigationNode(Node):
         self.top_view_resolution = self.top_view_size[0] / self.proximity_threshold
         self.top_view_sampling_step = 5
 
-        # 로봇 타입에 따른 이미지 크기 설정
         if args.robot == "locobot":
             self.DIM = (320, 240)
         elif args.robot == "robomaster":
@@ -124,16 +115,14 @@ class NavigationNode(Node):
 
         self._init_depth_model()
 
-        # Topological map ----------------------------------------------------
         self.topomap: List[PILImage] = self._load_topomap(args.dir)
         self.goal_node = (
             (len(self.topomap) - 1) if args.goal_node == -1 else args.goal_node
         )
         self.closest_node = 0
 
-        # ROS interfaces -----------------------------------------------------
         if args.robot == "locobot":
-            image_topic = "/robot1/camera/image"  # 상수에서 가져옴
+            image_topic = "/robot1/camera/image"
             waypoint_topic = "/robot1/waypoint"
             sampled_actions_topic = "/robot1/sampled_actions"
         elif args.robot == "robomaster":
@@ -158,7 +147,6 @@ class NavigationNode(Node):
         self.create_timer(1.0 / RATE, self._timer_cb)
         self.get_logger().info("Navigation node initialised. Waiting for images…")
 
-        # 시작하기 전에 중요한 파라미터들 출력
         self.get_logger().info("=" * 60)
         self.get_logger().info("NAVIGATION NODE PARAMETERS (with APF)")
         self.get_logger().info("=" * 60)
@@ -226,9 +214,9 @@ class NavigationNode(Node):
         self.get_logger().info("-" * 60)
         self.get_logger().info("ROS TOPICS:")
         self.get_logger().info(f"  - Subscribing to: {image_topic}")
-        self.get_logger().info(f"  - Publishing waypoints to: {WAYPOINT_TOPIC}")
+        self.get_logger().info(f"  - Publishing waypoints to: {waypoint_topic}")
         self.get_logger().info(
-            f"  - Publishing sampled actions to: {SAMPLED_ACTIONS_TOPIC}"
+            f"  - Publishing sampled actions to: {sampled_actions_topic}"
         )
         self.get_logger().info(
             f"  - Publishing navigation visualization to: /navigation_viz"
@@ -247,9 +235,6 @@ class NavigationNode(Node):
         self.get_logger().info(f"  - Pixels per meter: {PIXELS_PER_M}")
         self.get_logger().info(f"  - Origin Y ratio: {ORIGIN_Y_RATIO}")
         self.get_logger().info("=" * 60)
-
-    # Helper: topomap
-    # ------------------------------------------------------------------
 
     def _load_topomap(self, subdir: str) -> List[PILImage.Image]:
         dpath = TOPOMAP_IMAGES_DIR / subdir
@@ -279,10 +264,6 @@ class NavigationNode(Node):
             .to(self.device)
             .eval()
         )
-
-    # ------------------------------------------------------------------
-    # Callbacks
-    # ------------------------------------------------------------------
 
     def _image_cb(self, msg: Image):
         now = self.get_clock().now()
@@ -326,7 +307,6 @@ class NavigationNode(Node):
         mask = (Z > 0) & (Z <= self.proximity_threshold) & (Y >= -0.05)
         self._update_top_view_and_obstacles(X[mask], Y[mask], Z[mask])
 
-    # APF 관련 메서드들은 그대로 유지
     def _update_top_view_and_obstacles(self, X, Y, Z_0):
         Z = np.maximum(Z_0 - self.safety_margin, 1e-3)
         img_x = np.int32(self.top_view_size[0] // 2 + X * self.top_view_resolution)
@@ -486,9 +466,6 @@ class NavigationNode(Node):
         sg_pil = self.topomap[sg_global_idx]
         goal_pil = self.topomap[self.goal_node]
 
-        # -----------------------------------------------------------------
-        # 2. Sample trajectories towards sub‑goal (diffusion)
-        # -----------------------------------------------------------------
         with torch.no_grad():
             if obs_cond.ndim == 2:
                 obs_cond = obs_cond.repeat(self.args.num_samples, 1)
@@ -512,18 +489,12 @@ class NavigationNode(Node):
             self.obstacle_points is not None and len(self.obstacle_points) > 0
         )
 
-        # Repulsive force 적용
         self.original_trajectories = traj_batch.copy()
         traj_batch = self.apply_repulsive_forces_to_trajectories(traj_batch)
 
-        # 최종 trajectory 선택
         chosen_idx = self._select_closest_traj_angle(traj_batch, default_idx=0)
         chosen_waypoint = traj_batch[chosen_idx][self.args.waypoint]
         self.current_waypoint = chosen_waypoint
-
-        # -----------------------------------------------------------------
-        # 3. Publish ROS messages
-        # -----------------------------------------------------------------
         self._publish_msgs(traj_batch, chosen_waypoint)
         self._publish_viz_image(traj_batch, is_apf_applied)
         self._publish_goal_images(sg_pil, goal_pil)
@@ -533,7 +504,6 @@ class NavigationNode(Node):
         start = max(self.closest_node - self.args.radius, 0)
         end = min(self.closest_node + self.args.radius + 1, self.goal_node)
 
-        # 배치 준비
         batch_obs_imgs = []
         batch_goal_data = []
 
@@ -545,7 +515,6 @@ class NavigationNode(Node):
             batch_obs_imgs.append(transf_obs_img)
             batch_goal_data.append(goal_data)
 
-        # 모델 추론
         batch_obs_imgs = torch.cat(batch_obs_imgs, dim=0).to(self.device)
         batch_goal_data = torch.cat(batch_goal_data, dim=0).to(self.device)
 
@@ -554,12 +523,9 @@ class NavigationNode(Node):
             distances_np = to_numpy(distances)
             waypoints_np = to_numpy(waypoints)
 
-        # 가장 가까운 노드 찾기
         min_dist_idx = np.argmin(distances_np)
 
-        # 서브골과 경로점 선택
-        chosen_waypoint = np.zeros(4)  # 4차원 벡터
-        selected_waypoints = None
+        chosen_waypoint = np.zeros(4)
 
         if distances_np[min_dist_idx] > self.args.close_threshold:
             chosen_waypoint[:2] = waypoints_np[min_dist_idx][self.args.waypoint][:2]
@@ -571,56 +537,42 @@ class NavigationNode(Node):
             selected_waypoints = waypoints_np[next_idx]
             self.closest_node = min(start + min_dist_idx + 1, self.goal_node)
 
-        # 단일 궤적 생성 (APF 적용을 위해)
         traj_len = len(selected_waypoints)
         single_traj = np.zeros((traj_len, 2))
 
-        # 모델이 생성한 원래 궤적
         for i in range(traj_len):
             single_traj[i] = selected_waypoints[i][:2]
 
-        # 원본 궤적 저장
         self.original_trajectories = single_traj.copy()
 
-        # APF가 적용될 수 있는지 확인
         is_apf_applied = (
             self.obstacle_points is not None and len(self.obstacle_points) > 0
         )
 
-        # 단일 궤적에 대한 APF(Artificial Potential Field) 적용
         if is_apf_applied:
-            # 단일 궤적을 형태만 맞춰서 필요한 함수에 전달
             traj_batch = np.expand_dims(single_traj, axis=0)
             traj_batch = self.apply_repulsive_forces_to_trajectories(traj_batch)
-            # 결과에서 다시 단일 궤적 추출
             single_traj = traj_batch[0]
 
-        # 선택한 waypoint
         chosen_waypoint = single_traj[self.args.waypoint]
         self.current_waypoint = chosen_waypoint
 
-        # # 정규화 적용
         # if self.model_params.get("normalize", False):
         #     chosen_waypoint[:2] *= MAX_V / RATE
 
-        # 4차원 형태의 waypoint 메시지 생성
         full_waypoint = np.zeros(4)
         full_waypoint[:2] = chosen_waypoint
 
-        # waypoint 메시지 발행
         waypoint_msg = Float32MultiArray()
         # waypoint_msg.data = chosen_waypoint.tolist()
         waypoint_msg.data = full_waypoint.tolist()
         self.waypoint_pub.publish(waypoint_msg)
 
-        # 시각화를 위해 형식 맞추기
         traj_for_viz = np.expand_dims(single_traj, axis=0)
 
-        # 목표 도달 상태 발행
         reached_goal = bool(self.closest_node == self.goal_node)
         self.goal_pub.publish(Bool(data=reached_goal))
 
-        # 시각화를 위한 추가 코드
         sg_global_idx = min(
             start
             + min_dist_idx
@@ -630,7 +582,6 @@ class NavigationNode(Node):
         sg_pil = self.topomap[sg_global_idx]
         goal_pil = self.topomap[self.goal_node]
 
-        # 시각화를 위한 궤적 생성
         if selected_waypoints is not None:
             # traj_vis = np.zeros((1, len(selected_waypoints), 2))
             # for i in range(len(selected_waypoints)):
@@ -641,7 +592,6 @@ class NavigationNode(Node):
 
             self._publish_viz_image(traj_for_viz, is_apf_applied)
 
-        # 목표 이미지 발행
         self._publish_goal_images(sg_pil, goal_pil)
 
     # Publish helpers
@@ -676,7 +626,6 @@ class NavigationNode(Node):
         cx = img_w // 2
         cy = int(img_h * 0.95)
 
-        # 수정사항:
         pixels_per_m = 3.0
         lateral_scale = 1.0
         horizontal_scale = 1.0
@@ -699,22 +648,19 @@ class NavigationNode(Node):
             2,
         )  # Blue
 
-        # Draw each trajectory
         for i, traj in enumerate(traj_batch):
             pts = []
-            # 첫 점을 로봇 위치(cx, cy)에서 시작하도록 수정
-            pts.append((cx, cy))  # 시작점은 로봇의 현재 위치
+            pts.append((cx, cy))
 
             acc_x, acc_y = 0.0, 0.0
             for dx, dy in traj:
                 acc_x += dx
                 acc_y += dy
-                # lateral_scale 적용하여 좌우로 더 넓게
                 if is_apf_applied:
-                    px = int(cx - acc_y * pixels_per_m)  # acc_y 사용
+                    px = int(cx - acc_y * pixels_per_m)
                     py = int(cy - acc_x * pixels_per_m)
                 else:
-                    px = int(cx - acc_y * pixels_per_m * lateral_scale)  # acc_y 사용
+                    px = int(cx - acc_y * pixels_per_m * lateral_scale)
                     py = int(cy - acc_x * pixels_per_m * horizontal_scale)
                 pts.append((px, py))
 

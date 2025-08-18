@@ -19,7 +19,6 @@ from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
 
 from utils import msg_to_pil, to_numpy, transform_images, load_model
 from vint_train.training.train_utils import get_action
-from topic_names import IMAGE_TOPIC, WAYPOINT_TOPIC, SAMPLED_ACTIONS_TOPIC
 
 from unidepth.utils.camera import Pinhole
 from unidepth.models import UniDepthV2
@@ -140,7 +139,6 @@ class ExplorationNode(Node):
         intrinsics_path = self._get_intrinsics_path_from_config()
         self._init_depth_model(intrinsics_path)
 
-        # 시작하기 전에 중요한 파라미터들 출력
         self.get_logger().info("=" * 60)
         self.get_logger().info("EXPLORATION NODE PARAMETERS (with APF)")
         self.get_logger().info("=" * 60)
@@ -179,8 +177,8 @@ class ExplorationNode(Node):
         self.get_logger().info("-" * 60)
         self.get_logger().info("ROS TOPICS:")
         self.get_logger().info(f"  - Subscribing to: {image_topic}")
-        self.get_logger().info(f"  - Publishing waypoints to: {WAYPOINT_TOPIC}")
-        self.get_logger().info(f"  - Publishing sampled actions to: {SAMPLED_ACTIONS_TOPIC}")
+        self.get_logger().info(f"  - Publishing waypoints to: {waypoint_topic}")
+        self.get_logger().info(f"  - Publishing sampled actions to: {sampled_actions_topic}")
         self.get_logger().info(f"  - Publishing visualization to: /trajectory_viz")
         self.get_logger().info("-" * 60)
         self.get_logger().info("EXECUTION PARAMETERS:")
@@ -454,11 +452,6 @@ class ExplorationNode(Node):
         img_msg = self.bridge.cv2_to_imgmsg(viz, encoding="rgb8")
         img_msg.header.stamp = self.get_clock().now().to_msg()
         self.viz_pub.publish(img_msg)
-
-
-# ---------------------------------------------------------------------------
-# ENTRY POINT
-# ---------------------------------------------------------------------------
 
 
 def main():

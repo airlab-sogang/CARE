@@ -76,7 +76,7 @@ class ExplorationNode(Node):
         self.bridge = CvBridge()
 
         if args.robot == "locobot":
-            image_topic = "/robot1/camera/image"  # 상수에서 가져옴
+            image_topic = "/robot1/camera/image"
             waypoint_topic = "/robot1/waypoint"
             sampled_actions_topic = "/robot1/sampled_actions"
             trajectory_viz_topic = "/robot1/trajectory_viz"
@@ -102,7 +102,6 @@ class ExplorationNode(Node):
 
         self.create_timer(1.0 / RATE, self._timer_cb)
 
-        # 시작하기 전에 중요한 파라미터들 출력
         self.get_logger().info("=" * 60)
         self.get_logger().info("EXPLORATION NODE PARAMETERS")
         self.get_logger().info("=" * 60)
@@ -158,16 +157,15 @@ class ExplorationNode(Node):
     def _image_cb(self, msg: Image):
         now = self.get_clock().now()
         if (now - self.last_ctx_time).nanoseconds < self.ctx_dt * 1e9:
-            return  # 아직 0.25 s 안 지났으면 무시
+            return
         self.context_queue.append(msg_to_pil(msg))
         self.last_ctx_time = now
         self.get_logger().info(f"Image added to context queue ({len(self.context_queue)})")
 
     def _timer_cb(self):
         if len(self.context_queue) <= self.context_size:
-            return  # not enough context yet
+            return
 
-        # 1. Prepare tensors ------------------------------------------------
         obs_imgs = transform_images(
             list(self.context_queue), self.model_params["image_size"], center_crop=False
         ).to(self.device)
@@ -201,16 +199,9 @@ class ExplorationNode(Node):
                 )
                 naction = self.noise_scheduler.step(noise_pred, k, naction).prev_sample
 
-        # 2. Publish Float32MultiArray msgs ----------------------------------
         naction_np = to_numpy(get_action(naction))
         self._publish_action_msgs(naction_np)
-
-        # 3. Publish visualisation image ------------------------------------
         self._publish_viz_image(naction_np)
-
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
 
     def _publish_action_msgs(self, traj_batch: np.ndarray):
         sampled_actions_msg = Float32MultiArray()
@@ -225,14 +216,13 @@ class ExplorationNode(Node):
         self.waypoint_pub.publish(waypoint_msg)
 
     def _publish_viz_image(self, traj_batch: np.ndarray):
-        frame = np.array(self.context_queue[-1])  # latest RGB frame
+        frame = np.array(self.context_queue[-1])
         img_h, img_w = frame.shape[:2]
         viz = frame.copy()
 
         cx = img_w // 2
         cy = int(img_h * 0.95)
 
-        # 수정사항:
         pixels_per_m = 3.0
         lateral_scale = 1.0
         robot_symbol_length = 10
@@ -252,17 +242,14 @@ class ExplorationNode(Node):
             2,
         )
 
-        # Draw each trajectory
         for i, traj in enumerate(traj_batch):
             pts = []
-            # 수정: 첫 점을 로봇 위치(cx, cy)에서 시작
             pts.append((cx, cy))
 
             acc_x, acc_y = 0.0, 0.0
             for dx, dy in traj:
                 acc_x += dx
                 acc_y += dy
-                # 수정: acc_y를 사용하여 누적값으로 계산
                 px = int(cx - acc_y * pixels_per_m * lateral_scale)
                 py = int(cy - acc_x * pixels_per_m)
                 pts.append((px, py))
@@ -270,17 +257,12 @@ class ExplorationNode(Node):
             if len(pts) >= 2:
                 color = (
                     (0, 255, 0) if i == 0 else (255, 200, 0)
-                )  # 첫 번째 trajectory는 녹색
+                )
                 cv2.polylines(viz, [np.array(pts, dtype=np.int32)], False, color, 2)
 
         img_msg = self.bridge.cv2_to_imgmsg(viz, encoding="rgb8")
         img_msg.header.stamp = self.get_clock().now().to_msg()
         self.viz_pub.publish(img_msg)
-
-
-# ---------------------------------------------------------------------------
-# ENTRY POINT
-# ---------------------------------------------------------------------------
 
 
 def main():
