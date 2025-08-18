@@ -22,8 +22,8 @@ from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
 from utils import msg_to_pil, to_numpy, transform_images, load_model
 from vint_train.training.train_utils import get_action
 
-from UniDepth.unidepth.models import UniDepthV2
-from UniDepth.unidepth.utils.camera import Pinhole
+from unidepth.models import UniDepthV2
+from unidepth.utils.camera import Pinhole
 
 THIS_DIR = Path(__file__).resolve().parent
 ROBOT_CONFIG_PATH = THIS_DIR / "../config/robot.yaml"
