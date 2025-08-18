@@ -1,6 +1,6 @@
 # Robot Navigation Project
 
-This project implements robot navigation using Artificial Potential Field (APF) control for multiple robot platforms.
+This repository contains the implementation of CARE: Enhancing Safety of Visual Navigation through Collision Avoidance via Repulsive Estimation, accepted to CoRL 2025.
 
 ## Environment Setup
 
