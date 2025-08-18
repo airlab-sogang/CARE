@@ -25,7 +25,6 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float32MultiArray, Bool
 
-from topic_names import WAYPOINT_TOPIC, REACHED_GOAL_TOPIC
 from utils import clip_angle  # assumes utils.py provides this helper
 
 CONFIG_PATH = "deployment/config/robot.yaml"
@@ -81,7 +80,7 @@ class PDControllerNode(Node):
         self.create_subscription(
             Float32MultiArray, waypoint_topic, self._waypoint_cb, 1
         )
-        self.create_subscription(Bool, REACHED_GOAL_TOPIC, self._goal_cb, 1)
+        self.create_subscription(Bool, "/topoplan/reached_goal", self._goal_cb, 1)
 
         self.create_timer(1.0 / RATE, self._timer_cb)
         self.get_logger().info(
