@@ -25,10 +25,10 @@ from vint_train.training.train_utils import get_action
 from unidepth.models import UniDepthV2
 from unidepth.utils.camera import Pinhole
 
-THIS_DIR = Path(__file__).resolve().parent
-ROBOT_CONFIG_PATH = THIS_DIR / "../config/robot.yaml"
-MODEL_CONFIG_PATH = THIS_DIR / "../config/models.yaml"
-TOPOMAP_IMAGES_DIR = THIS_DIR / "../topomaps/images"
+THIS_DIR = Path.cwd()
+ROBOT_CONFIG_PATH = THIS_DIR / "deployment/config/robot.yaml"
+MODEL_CONFIG_PATH = THIS_DIR / "deployment/config/models.yaml"
+TOPOMAP_IMAGES_DIR = THIS_DIR / "deployment/topomaps/images"
 
 with open(ROBOT_CONFIG_PATH, "r") as f:
     ROBOT_CONF = yaml.safe_load(f)

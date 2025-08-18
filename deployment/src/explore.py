@@ -20,9 +20,9 @@ from std_msgs.msg import Float32MultiArray
 from utils import msg_to_pil, to_numpy, transform_images, load_model
 from vint_train.training.train_utils import get_action
 
-THIS_DIR = Path(__file__).resolve().parent
-ROBOT_CONFIG_PATH = THIS_DIR / "../config/robot.yaml"
-MODEL_CONFIG_PATH = THIS_DIR / "../config/models.yaml"
+THIS_DIR = Path.cwd()
+ROBOT_CONFIG_PATH = THIS_DIR / "deployment/config/robot.yaml"
+MODEL_CONFIG_PATH = THIS_DIR / "deployment/config/models.yaml"
 
 with open(ROBOT_CONFIG_PATH, "r") as f:
     ROBOT_CONF = yaml.safe_load(f)
