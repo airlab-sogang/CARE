@@ -6,7 +6,4 @@ frame_rate: 4 # Hz
 graph_rate: 0.3333 # Hz
 
 # topic names (modify for different robots/nodes)
-vel_teleop_topic: /cmd_vel_mux/input/teleop
-vel_navi_topic: /cmd_vel
-vel_recovery_topic: /cmd_vel_mux/input/recovery
-intrinsics_path: /intrinsic/locobot/intrinsics.npy
+intrinsics_path: intrinsic/locobot/intrinsics.npy
