@@ -53,9 +53,6 @@ class PDControllerNode(Node):
         if args.robot == "locobot":
             waypoint_topic = "/robot1/waypoint"
             vel_topic = "/robot1/cmd_vel"
-        elif args.robot == "locobot2":
-            waypoint_topic = "/robot3/waypoint"
-            vel_topic = "/robot3/cmd_vel"
         elif args.robot == "robomaster":
             waypoint_topic = "/robot3/waypoint"
             vel_topic = "/cmd_vel"

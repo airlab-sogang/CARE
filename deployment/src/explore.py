@@ -9,19 +9,17 @@ from typing import Deque
 import cv2
 import numpy as np
 import rclpy
+import torch
+import yaml
 from cv_bridge import CvBridge
+from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import Float32MultiArray
-import torch
-import yaml
-from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
 
 from utils import msg_to_pil, to_numpy, transform_images, load_model
 from vint_train.training.train_utils import get_action
-from topic_names import IMAGE_TOPIC, WAYPOINT_TOPIC, SAMPLED_ACTIONS_TOPIC
 
-# ------------------------------- CONSTANTS ----------------------------------
 THIS_DIR = Path(__file__).resolve().parent
 ROBOT_CONFIG_PATH = THIS_DIR / "../config/robot.yaml"
 MODEL_CONFIG_PATH = THIS_DIR / "../config/models.yaml"
@@ -82,11 +80,6 @@ class ExplorationNode(Node):
             waypoint_topic = "/robot1/waypoint"
             sampled_actions_topic = "/robot1/sampled_actions"
             trajectory_viz_topic = "/robot1/trajectory_viz"
-        elif args.robot == "locobot2":
-            image_topic = "/robot3/camera/image"
-            waypoint_topic = "/robot3/waypoint"
-            sampled_actions_topic = "/robot3/sampled_actions"
-            trajectory_viz_topic = "/robot3/trajectory_viz"
         elif args.robot == "robomaster":
             image_topic = "/camera/image_color"
             waypoint_topic = "/robot3/waypoint"
@@ -139,9 +132,9 @@ class ExplorationNode(Node):
         self.get_logger().info("-" * 60)
         self.get_logger().info("ROS TOPICS:")
         self.get_logger().info(f"  - Subscribing to: {image_topic}")
-        self.get_logger().info(f"  - Publishing waypoints to: {WAYPOINT_TOPIC}")
+        self.get_logger().info(f"  - Publishing waypoints to: {waypoint_topic}")
         self.get_logger().info(
-            f"  - Publishing sampled actions to: {SAMPLED_ACTIONS_TOPIC}"
+            f"  - Publishing sampled actions to: {sampled_actions_topic}"
         )
         self.get_logger().info(f"  - Publishing visualization to: /trajectory_viz")
         self.get_logger().info("-" * 60)
