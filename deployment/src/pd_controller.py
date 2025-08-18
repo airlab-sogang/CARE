@@ -50,7 +50,6 @@ class PDControllerNode(Node):
         super().__init__("pd_controller")
         self.controller_type = args.control
 
-        # 로봇 타입에 따른 이미지 토픽 선택
         if args.robot == "locobot":
             waypoint_topic = "/robot1/waypoint"
             vel_topic = "/robot1/cmd_vel"
@@ -66,7 +65,7 @@ class PDControllerNode(Node):
         else:
             raise ValueError(f"Unknown robot type: {args.robot}")
 
-        self.get_logger().info(f"로봇 타입: {args.robot}, 사용 토픽: {waypoint_topic}, {vel_topic}")
+        self.get_logger().info(f"Robot Type: {args.robot}, Topics: {waypoint_topic}, {vel_topic}")
 
         self.waypoint: Optional[np.ndarray] = None
         self._last_wp_time: float = 0.0
@@ -120,7 +119,6 @@ class PDControllerNode(Node):
         else:
             raise ValueError("Waypoint must be 2‑D or 4‑D vector")
 
-        # === 각도 계산 ===
         if use_heading:
             v = 0.0
             desired_yaw = np.arctan2(hy, hx)

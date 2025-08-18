@@ -65,19 +65,19 @@ pip install --upgrade "numpy<2,>=1.26"
 #### Terminal 1: PD Controller (Required)
 ```bash
 # This must be running for any navigation mode
-python pd_controller.py --control care --robot locobot
+python deployment/src/pd_controller.py --control care --robot locobot
 ```
 
 #### Terminal 2: Navigation Mode (Choose one)
 
 **Standard Navigation (Baseline)**
 ```bash
-python explore.py --waypoint 2 --robot locobot
+python deployment/src/explore.py --waypoint 2 --robot locobot
 ```
 
 **CARE-Enhanced Navigation (Recommended)**
 ```bash
-python explore_care.py --waypoint 2 --robot locobot
+python deployment/src/explore_care.py --waypoint 2 --robot locobot
 ```
 
 ## 📖 Usage
@@ -99,16 +99,16 @@ Autonomous exploration with collision avoidance:
 
 **Terminal 1 (PD Controller - Required):**
 ```bash
-python pd_controller.py --control care --robot [ROBOT_TYPE]
+python deployment/src/pd_controller.py --control care --robot [ROBOT_TYPE]
 ```
 
 **Terminal 2 (Choose one):**
 ```bash
 # Standard exploration
-python explore.py --waypoint 2 --robot [ROBOT_TYPE]
+python deployment/src/explore.py --waypoint 2 --robot [ROBOT_TYPE]
 
 # CARE-enhanced exploration (recommended)
-python explore_care.py --waypoint 2 --robot [ROBOT_TYPE]
+python deployment/src/explore_care.py --waypoint 2 --robot [ROBOT_TYPE]
 ```
 
 #### 2. Goal-Conditioned Navigation
@@ -116,13 +116,13 @@ Navigate to specific image goals:
 
 **Terminal 1 (PD Controller - Required):**
 ```bash
-python pd_controller.py --control care --robot [ROBOT_TYPE]
+python deployment/src/pd_controller.py --control care --robot [ROBOT_TYPE]
 ```
 
 **Terminal 2:**
 ```bash
 # With goal image
-python explore_care.py --waypoint 2 --robot [ROBOT_TYPE] --goal_image path/to/goal.jpg
+python deployment/src/explore_care.py --waypoint 2 --robot [ROBOT_TYPE] --goal_image path/to/goal.jpg
 ```
 
 ### Complete Usage Examples
@@ -130,28 +130,28 @@ python explore_care.py --waypoint 2 --robot [ROBOT_TYPE] --goal_image path/to/go
 #### Example 1: LoCoBot CARE-Enhanced Exploration
 ```bash
 # Terminal 1 (keep running)
-python pd_controller.py --control care --robot locobot
+python deployment/src/pd_controller.py --control care --robot locobot
 
 # Terminal 2
-python explore_care.py --waypoint 2 --robot locobot
+python deployment/src/explore_care.py --waypoint 2 --robot locobot
 ```
 
 #### Example 2: TurtleBot4 Standard Navigation
 ```bash
 # Terminal 1 (keep running)
-python pd_controller.py --control care --robot turtlebot4
+python deployment/src/pd_controller.py --control care --robot turtlebot4
 
 # Terminal 2
-python explore.py --waypoint 2 --robot turtlebot4
+python deployment/src/explore.py --waypoint 2 --robot turtlebot4
 ```
 
 #### Example 3: RoboMaster Goal-Conditioned Navigation
 ```bash
 # Terminal 1 (keep running)
-python pd_controller.py --control care --robot robomaster
+python deployment/src/pd_controller.py --control care --robot robomaster
 
 # Terminal 2
-python explore_care.py --waypoint 2 --robot robomaster
+python deployment/src/explore_care.py --waypoint 2 --robot robomaster
 ```
 
 ### Parameters
