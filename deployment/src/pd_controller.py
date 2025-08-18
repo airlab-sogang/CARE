@@ -28,7 +28,7 @@ from std_msgs.msg import Float32MultiArray, Bool
 from topic_names import WAYPOINT_TOPIC, REACHED_GOAL_TOPIC
 from utils import clip_angle  # assumes utils.py provides this helper
 
-CONFIG_PATH = "../config/robot.yaml"
+CONFIG_PATH = "deployment/config/robot.yaml"
 with open(CONFIG_PATH, "r") as f:
     robot_cfg = yaml.safe_load(f)
 
